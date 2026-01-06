@@ -1,0 +1,16 @@
+----- cmd
+.\.venv\Scripts\activate.bat
+
+pip install -r requirements.txt
+
+----- powershell ดู directory
+$root = (Get-Location).Path
+
+Get-ChildItem -Path $root -Recurse -Force |
+  Where-Object { $_.FullName -notmatch '\\\.venv(\\|$)' } |
+  Sort-Object FullName |
+  ForEach-Object {
+    $rel = $_.FullName.Substring($root.Length).TrimStart('\')
+    $depth = ($rel -split '\\').Count - 1
+    ('  ' * $depth) + $rel + ($(if ($_.PSIsContainer) { '\' } else { '' }))
+  }
