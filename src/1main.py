@@ -17,8 +17,8 @@ from done.read_text import extract_page_text_as_debug_string
 
 
 list_pdf = ["""
-https://drive.google.com/file/d/1BuRHEYFGX0uQRJaiAG_Wo8TLnuZfxIZa/edit
-                                                                                                            
+https://drive.google.com/file/d/1Z1yqquXlgKTRaK7AEBGMV2fbxUqti3kO/edit
+                                                                                          
             """
 ]
 
@@ -99,7 +99,7 @@ for i in list_pdf:
 
     start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
     
-    start_chunk_page = [x if i == 7 or i == 8 else None for i, x in enumerate(start_chunk_page)]
+    start_chunk_page = [x if i == 2 or i == 1 else None for i, x in enumerate(start_chunk_page)]
 
 
     for i, x in enumerate(start_chunk_page):
@@ -172,7 +172,7 @@ for i in list_pdf:
             schema=schema,
             pdf_bytes=chunk_pdf_bytes,
             engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-            temperature=0.05,
+            temperature=0.00,
         )
 
         data = reorder_by_schema(data, schema)
