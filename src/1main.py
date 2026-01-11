@@ -17,8 +17,8 @@ from done.read_text import extract_page_text_as_debug_string
 
 
 list_pdf = ["""
-https://drive.google.com/file/d/1Z1yqquXlgKTRaK7AEBGMV2fbxUqti3kO/edit
-                                                                                          
+https://drive.google.com/file/d/1Z_0zWJQQCrjyEvivrt1lr4ys6FmfkMmO/edit
+                                                                                                                  
             """
 ]
 
@@ -96,10 +96,11 @@ for i in list_pdf:
     print(f"PDF: {i}")
     file_id = _extract_file_id_from_drive_url(PDF_URL)
     pdf_bytes = download_drive_pdf_bytes(drive, file_id)
+    print('already download file')
 
     start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
     
-    start_chunk_page = [x if i == 2 or i == 1 else None for i, x in enumerate(start_chunk_page)]
+    start_chunk_page = [x if i == 5 or i == 6 else None for i, x in enumerate(start_chunk_page)]
 
 
     for i, x in enumerate(start_chunk_page):
@@ -178,7 +179,6 @@ for i in list_pdf:
         data = reorder_by_schema(data, schema)
         print(json.dumps(data, ensure_ascii=False, indent=2))
 
-
         out_dir = Path("data")
         out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -187,6 +187,3 @@ for i in list_pdf:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
         print("[OK] wrote:", out_path.resolve())
-
-
-

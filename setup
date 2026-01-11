@@ -2,11 +2,22 @@
 
 pip install -r requirements.txt
 
+
+---- Dockerversion
+docker build -t extract_data .
+#mount .env + service_account
+docker run -p 8000:8000 --env-file .env extract_data
+
+
 ----- powershell ดู directory
 $root = (Get-Location).Path
 
 Get-ChildItem -Path $root -Recurse -Force |
-  Where-Object { $_.FullName -notmatch '\\\.venv(\\|$)' } |
+  Where-Object {
+    $_.FullName -notmatch '\\\.venv(\\|$)' -and
+    $_.FullName -notmatch '\\\.git(\\|$)' -and
+    $_.FullName -notmatch '\\__pycache__(\\|$)'
+  } |
   Sort-Object FullName |
   ForEach-Object {
     $rel = $_.FullName.Substring($root.Length).TrimStart('\')

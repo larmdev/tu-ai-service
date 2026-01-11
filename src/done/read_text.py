@@ -11,8 +11,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 # ✅ ใส่ URL ของไฟล์ PDF ตรงนี้ (ไม่ใช่โฟลเดอร์)
-PDF_URL = "https://drive.google.com/file/d/1I9qBUchBydejWwGgbkpC-IdZFvfg61G-/edit"
-page_to_check = 60
+PDF_URL = "https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit"
+page_to_check = 54
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
