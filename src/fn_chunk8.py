@@ -1,44 +1,90 @@
+def schema_prompt(chunk_pdf_bytes: bytes = None):
 
-def schema_prompt(chunk_pdf_bytes: bytes=None):
+    prompt = """
+        จากเนื้อหาในไฟล์ PDF
+        ❗ ห้ามอธิบาย
+        ❗ ตอบเป็น JSON เท่านั้น ตาม schema
 
+        หมวดที่ 8 การบริหารหลักสูตร การควบคุมคุณภาพ และการประกันคุณภาพ
 
-    prompt = """จากในไฟล์ที่ทำการ extract เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-        ข้อจากหมวดที่ 8
+        ให้ดึงข้อมูลต่อไปนี้:
 
-        (หัวข้อเหล่านี้อยู่ในหัวข้อ การจัดการคุณภาพหลักสูตร)
-        development_plan จ่ากหัวข้อ การวางแผนสร้าง/พัฒนาหลักสูตร ให้เอาข้อความมาทั้งหมด,
-        manage_curr จาก วิธีวัดมาตราฐานของ คุณภาพด้านการบริหารหลักสูตร (ข้อมูลนี้อยู่ในตารางซึ่งมีหัวตารางคือ คุณภาพ และ วิธีการวัด ข้อมูลนี้อยู่ใน วิธีการวัด แถวที่ คุณภาพ มีค่าเป็น ด้านการบริหารหลักสูตร),
-        qa_detail จาก ได้มีผู้เกี่ยวข้องกับการควบคุมคุณภาพหลักสูตร (ให้เอาข้อมูลมาทั้งหมด หากมีหลายข้อไม่ต้องเอาลำดับมาแต่ แต่ละข้อคั่นด้วย ','),
-        qa_type จาก การประกันคุณภาพหลักสูตร (เอาข้อความมาทั้งหมด หากมีหลายข้อย่อย ส่วนหัวข้อย่อยต่างๆให้ใส่วงเล็บ '{}' แล้วคั่นด้วย ',' และหากมีการพูดถึงว่าแต่ละปีใช้เกณฑ์อะไร ไม่ต้องเอาปี เอาแค่ว่าในแต่ละประเภทการประกันคุณภาพการศึกษาใช้เกณฑ์อะไร),
-        year_development จาก การพัฒนา/ปรับปรุงหลักสูตรประจําปี (เอาข้อความมาทั้งหมด),
+        1. การวางแผนและพัฒนาหลักสูตร
+        - หลักการ แนวคิด หรือกระบวนการพัฒนา
 
-        criteria_qa_curr จาก ตัวชี้วัดคุณภาพหลักสูตรฯ ด้านเกณฑ์มาตรฐานหลักสูตร ประจําปี (เอาข้อความมาทั้งหมด หากมีหลายข้อย่อย ส่วนหัวข้อย่อยต่างๆให้ใส่วงเล็บ '{}' แล้วคั่นด้วย ','  ),
+        2. การควบคุมคุณภาพหลักสูตร
+        - เกณฑ์มาตรฐาน
+        - การบริหารจัดการหลักสูตร
+        - รายละเอียดการควบคุมคุณภาพ
 
-        (หัวข้อเหล่านี้อยู่ในหัวข้อ การบริหารความเสี่ยง)
-        risk_requirement_stakeholder จาก ด้านความต้องการของผู้มีส่วนได้ส่วนเสีย (เอาข้อความมาทั้งหมด หากมีหลายข้อย่อย ส่วนหัวข้อย่อยต่างๆให้ใส่วงเล็บ '{}' แล้วคั่นด้วย ','  ),
-        risk_plo จาก ด้านผลลัพธ์การเรียนรู้ระดับรายวิชา/ชุดวิชาและระดับหลักสูตร (เอาข้อความมาทั้งหมด หากมีหลายข้อย่อย ส่วนหัวข้อย่อยต่างๆให้ใส่วงเล็บ '{}' แล้วคั่นด้วย ','  ),
-        risk_lecturer จาก ด้านอาจารย์ผู้รับผิดชอบหลักสูตร/อาจารย์ประจําหลักสูตร (เอาข้อความมาทั้งหมด หากมีหลายข้อย่อย ส่วนหัวข้อย่อยต่างๆให้ใส่วงเล็บ '{}' แล้วคั่นด้วย ','  ),
-        risk_amount_collegian จาก ด้านจํานวนนักศึกษา (เอาข้อความมาทั้งหมด หากมีหลายข้อย่อย ส่วนหัวข้อย่อยต่างๆให้ใส่วงเล็บ '{}' แล้วคั่นด้วย ','  ),
+        3. ระบบประกันคุณภาพหลักสูตร
+        - ภายใน / ภายนอก
+
+        4. การปรับปรุงหลักสูตรประจำปี
+
+        5. ตัวชี้วัดคุณภาพหลักสูตรประจำปี
+
+        6. การประเมินความต้องการของผู้มีส่วนได้ส่วนเสีย
+
+        7. ผลลัพธ์การเรียนรู้ของผู้เรียน (PLO / CLO)
+
+        8. การติดตามคุณภาพอาจารย์ผู้รับผิดชอบหลักสูตร
+
+        9. การควบคุมคุณภาพด้านจำนวนนักศึกษา
         """
-
 
     schema = {
         "type": "object",
         "properties": {
-            "development_plan": {"type": ["string", "null"]},
-            "manage_curr": {"type": ["string", "null"]},
-            "qa_detail": {"type": ["string", "null"]},
-            "qa_type": {"type": ["string", "null"]},
-            "year_development": {"type": ["string", "null"]},
-            "criteria_qa_curr": {"type": ["string", "null"]},
-            "risk_requirement_stakeholder": {"type": ["string", "null"]},
-            "risk_plo": {"type": ["string", "null"]},
-            "risk_lecturer": {"type": ["string", "null"]},
-            "risk_amount_collegian": {"type": ["string", "null"]},
+            "curriculumId": {
+                "type": ["string", "null"]
+            },
+            "curriculumPlanningAndDevelopment": {
+                "type": ["string", "null"]
+            },
+            "curriculumQualityControl": {
+                "type": ["object", "null"],
+                "properties": {
+                    "standardCriteria": {
+                        "type": ["string", "null"]
+                    },
+                    "curriculumManagement": {
+                        "type": ["string", "null"]
+                    },
+                    "details": {
+                        "type": ["string", "null"]
+                    }
+                },
+                "required": [
+                    "standardCriteria",
+                    "curriculumManagement",
+                    "details"
+                ],
+                "additionalProperties": False
+            },
+            "curriculumQualityAssurance": {
+                "type": ["string", "null"]
+            },
+            "annualCurriculumImprovement": {
+                "type": ["string", "null"]
+            },
+            "annualCurriculumQualityIndicators": {
+                "type": ["string", "null"]
+            },
+            "stakeholderNeeds": {
+                "type": ["string", "null"]
+            },
+            "learningOutcomeResults": {
+                "type": ["string", "null"]
+            },
+            "courseLecturerQuality": {
+                "type": ["string", "null"]
+            },
+            "studentCountQuality": {
+                "type": ["string", "null"]
+            }
         },
-        "additionalProperties": False,
-        "required": []
+        "additionalProperties": False
     }
-
 
     return schema, prompt
