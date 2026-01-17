@@ -1,201 +1,274 @@
-from src.fn_gemini import call_openrouter_pdf
-from src.fn_slice_page_pdf import slice_pdf_pages
-from src.fn_pdf_to_byte import to_pdf_bytes
-from src.fn_chunk_number import locate_chunks
-import os
-import json
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from dotenv import load_dotenv
+import os, json
 
-import io
-import re
-from typing import Any, Dict
-from pathlib import Path
+from fn_gemini import call_openrouter_pdf
+from fn_slice_page_pdf import slice_pdf_pages
+from fn_chunk_number import locate_chunks
+from fn_pdf_from_url import load_pdf_from_url
+
+load_dotenv()
 
 OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
 MODEL = os.getenv("MODEL")
 
-def reorder_by_schema(data: Dict[str, Any], schema: Dict[str, Any]) -> Dict[str, Any]:
-    props = schema.get("properties", {})
-    ordered: Dict[str, Any] = {}
-
-    for k in props.keys():           # เรียงตามลำดับใน schema["properties"]
-        ordered[k] = data.get(k, None)
-
-    return ordered
-
-
-from fastapi import FastAPI, UploadFile, File, HTTPException
-
 app = FastAPI()
 
-@app.post("/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...)):
-    pdf_bytes = await file.read()
+from pydantic import BaseModel
+from typing import Optional
+
+class ChunkRequest(BaseModel):
+    refId: str
+    url: str
+    fileName: Optional[str] = None
+
+
+def process_chunk(
+    pdf_bytes: bytes,
+    chunk_index: int,
+    schema_prompt_fn
+):
+    chunk_pages = list(
+        v for k, v in locate_chunks(pdf_bytes=pdf_bytes, debug=False).items()
+        if k != "last_page"
+    )
+
+    start_page = chunk_pages[chunk_index]
+    end_page = chunk_pages[chunk_index + 1]
+
+    chunk_pdf_bytes = slice_pdf_pages(
+        pdf_bytes=pdf_bytes,
+        start_page=start_page,
+        end_page=end_page
+    )
+
+    schema, prompt = schema_prompt_fn(chunk_pdf_bytes=chunk_pdf_bytes)
+
+    data = call_openrouter_pdf(
+        api_key=OPEN_ROUTER_KEY,
+        model=MODEL,
+        prompt=prompt,
+        schema=schema,
+        pdf_bytes=pdf_bytes,   # ❗ ใช้ pdf เต็ม เหมือนของเดิม
+        engine="pdf-text",
+        temperature=0.0,
+    )
+
+    return data
+
+async def get_pdf_bytes(file: UploadFile | None, pdf_url: str | None) -> bytes:
+    if file:
+        pdf_bytes = await file.read()
+    elif pdf_url:
+        pdf_bytes = load_pdf_from_url(pdf_url)
+    else:
+        raise HTTPException(400, "ต้องส่ง file หรือ pdf_url")
 
     if not pdf_bytes.startswith(b"%PDF-"):
-            raise HTTPException(status_code=400, detail="Not a real PDF")
-    start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
+        raise HTTPException(400, "Not a valid PDF")
+
+    return pdf_bytes
+
+@app.post("/chunk-1")
+async def chunk_1(body: ChunkRequest):
     
-    ### รอลบ
-    start_chunk_page = [x if i == 1 or i == 0 else None for i, x in enumerate(start_chunk_page)]
+    from fn_chunk1 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    print(start_chunk_page)
-    for i in range(len(start_chunk_page)-1) :
-        start_page = start_chunk_page[i]
-        end_page = start_chunk_page[i + 1]
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=0,
+        schema_prompt_fn=schema_prompt
+    )
 
-        print("                -------------             ")
-        
-        print("i =",i,"->",start_page,"and",end_page)
+    ## callback-api
 
-        if start_page is None or end_page is None:
-            continue
-
-        chunk_pdf_bytes = slice_pdf_pages(
-            pdf_bytes=pdf_bytes,
-            start_page=start_page,
-            end_page=end_page
-        )
-
-        if i == 0 and start_page is not None and end_page is not None:
-            print("do 1")
-            from src.fn_chunk1 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 1 and start_page is not None and end_page is not None:
-            from src.fn_chunk2 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 2 and start_page is not None and end_page is not None:
-            from src.fn_chunk3 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 3 and start_page is not None and end_page is not None:
-            from src.fn_chunk4 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 4 and start_page is not None and end_page is not None:
-            from src.fn_chunk4_2 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 5 and start_page is not None and end_page is not None:
-            from src.fn_chunk5 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 6 and start_page is not None and end_page is not None:
-            from src.fn_chunk6 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 7 and start_page is not None and end_page is not None:
-            from src.fn_chunk7 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 8 and start_page is not None and end_page is not None:
-            from src.fn_chunk8 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        elif i == 9 and start_page is not None and end_page is not None:
-            from src.fn_chunk9 import schema_prompt
-            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-        data = call_openrouter_pdf(
-            api_key=OPEN_ROUTER_KEY,
-            model=MODEL,
-            prompt=prompt,
-            schema=schema,
-            pdf_bytes=pdf_bytes,
-            engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-            temperature=0.0,
-        )
-        print("                -------------             ")
-        data = reorder_by_schema(data, schema)
-        print(json.dumps(data, ensure_ascii=False, indent=2))
-
-    return {"filename": data}
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk1",
+        "data": data
+    }
 
 
+@app.post("/chunk-2")
+async def chunk_2(body: ChunkRequest):
+    
+    from fn_chunk2 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=1,
+        schema_prompt_fn=schema_prompt
+    )
+
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk2",
+        "data": data
+    }
 
 
+@app.post("/chunk-3")
+async def chunk_3(body: ChunkRequest):
+
+    from fn_chunk3 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=2,
+        schema_prompt_fn=schema_prompt
+    )
+
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk3",
+        "data": data
+    }
 
 
+@app.post("/chunk-4")
+async def chunk_4(body: ChunkRequest):
+
+    from fn_chunk4 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=3,
+        schema_prompt_fn=schema_prompt
+    )
+
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk4",
+        "data": data
+    }
+
+@app.post("/chunk-5")
+async def chunk_5(body: ChunkRequest):
+
+    from fn_chunk5 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=4,
+        schema_prompt_fn=schema_prompt
+    )
+
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk5",
+        "data": data
+    }
+
+@app.post("/chunk-6")
+async def chunk_6(body: ChunkRequest):
+
+    from fn_chunk6 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=5,
+        schema_prompt_fn=schema_prompt
+    )
+
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk6",
+        "data": data
+    }
+
+@app.post("/chunk-7")
+async def chunk_7(body: ChunkRequest):
+
+    from fn_chunk7 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=6,
+        schema_prompt_fn=schema_prompt
+    )
+
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk7",
+        "data": data
+    }
+
+@app.post("/chunk-8")
+async def chunk_8(body: ChunkRequest):
+
+    from fn_chunk8 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=7,
+        schema_prompt_fn=schema_prompt
+    )
+
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk8",
+        "data": data
+    }
 
 
+@app.post("/chunk-9")
+async def chunk_9(body: ChunkRequest):
 
+    from fn_chunk9 import schema_prompt
+    try:
+        pdf_bytes = load_pdf_from_url(body.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
+    data = process_chunk(
+        pdf_bytes=pdf_bytes,
+        chunk_index=8,
+        schema_prompt_fn=schema_prompt
+    )
 
-
-
-
-
-
-
-
-# ----------------------------------------------------------------------
-# OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
-# MODEL = os.getenv("MODEL")
-
-### pdf from .....
-# pdf_bytes = to_pdf_bytes(pdf)
-
-
-### print(chunk_page) -> {'chunk1': 2, 'chunk2': 5, 'chunk3': 6, 'chunk4': 10, 'chunk4_2': 24, 'chunk5': 60, 'chunk6': 64, 'chunk7': 68, 'chunk8': 69, 'chunk9': 70, 'end_chunk': 73, 'last_page': 75}
-# start_chunk_page = [1] + [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ("chunk1", "last_page")]
-
-# for i in range(len(start_chunk_page)-1) :
-    # start_page = start_chunk_page[i]
-    # end_page = start_chunk_page[i + 1]
-
-#     chunk_pdf_bytes = slice_pdf_pages(
-#         pdf_bytes=pdf_bytes,
-#         start_page=start_page,
-#         end_page=end_page
-#     )
-
-    # if i == 0 and start_page is not None and end_page is not None:
-#         from fn_chunk1 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 1 and start_page is not None and end_page is not None:
-#         from fn_chunk2 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 2 and start_page is not None and end_page is not None:
-#         from fn_chunk3 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 3 and start_page is not None and end_page is not None:
-#         from fn_chunk4 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 4 and start_page is not None and end_page is not None:
-#         from fn_chunk4_2 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 5 and start_page is not None and end_page is not None:
-#         from fn_chunk5 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 6 and start_page is not None and end_page is not None:
-#         from fn_chunk6 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 7 and start_page is not None and end_page is not None:
-#         from fn_chunk7 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 8 and start_page is not None and end_page is not None:
-#         from fn_chunk8 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     elif i == 9 and start_page is not None and end_page is not None:
-#         from fn_chunk9 import schema_prompt
-#         schema, prompt = schema_prompt(pdf_bytes=chunk_pdf_bytes)
-
-#     data = call_openrouter_pdf(
-#         api_key=OPEN_ROUTER_KEY,
-#         model=MODEL,
-#         prompt=prompt,
-#         schema=schema,
-#         pdf_bytes=chunk_pdf_bytes,
-#         engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-#         temperature=0.0,
-#     )
+    return {
+        "refId": body.refId,
+        "fileName": body.fileName,
+        "chunk": "chunk9",
+        "data": data
+    }

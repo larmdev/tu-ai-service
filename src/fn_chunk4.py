@@ -1,130 +1,220 @@
+def schema_prompt(chunk_pdf_bytes: bytes = None):
 
-def schema_prompt(chunk_pdf_bytes: bytes=None):
+    prompt = """
+        จากไฟล์ที่ทำการ extract เรียงจากบนลงล่าง
+        ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
 
-    prompt = """จากในไฟล์ที่ทำการ extract เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-    หมวดที่ 4 ไม่ถึง คำอธิบายรายวิชา
+        หมวดที่ 4 ระบบการจัดการศึกษาและโครงสร้างหลักสูตร
 
-    max_semester จาก ระยะเวลาการศึกษาสูงสุด ให้เอามาแค่เลข
+        - educationSystem จากหัวข้อ ระบบการจัดการศึกษา
+        - isMaxStudyDurationYears ให้เป็น true ถ้ามีข้อความกำหนดระยะเวลาศึกษาสูงสุด
+        - maxStudyDurationYears เอาข้อความเต็ม เช่น "ไม่เกิน 8 ปีการศึกษา"
 
-    (ในบางหมวดจะมีให้ติ๊กเลือก วิธีหากไม่รู้ว่าเลือกค่าใดส่วนมากจะเป็นตัวที่ถูกเลือกค่าเดียวในแต่ละหมวด แต่หากถูกเลือกหลายค่าให้ใส่ ',' คั่น)
-    day_class จาก วัน-เวลา ในการดําเนินการเรียนการสอน หมวดที่เจอคำคล้ายๆว่า 'วัน – เวลาราชการปกติ หรือนอกวัน – เวลาราชการ' (ส่วนมากจะเป็นช่องให้ติ๊ก เอามาเฉพาะค่าที่ถูกเลือก)
+        - teachingSchedule จากตารางภาคการศึกษา
+            - sequence เรียงตามลำดับ
+            - semesterName
+            - start เดือนเริ่ม
+            - end เดือนสิ้นสุด
 
-    detail_day_class (รวมรายละเอียดช่วงเวลาเรียนของภาคการศึกษาทั้งหมด)
-    type_day_class ภาคการศึกษาที่เปิดเรียน (เช่น ภาคการศึกษาที่ 1 ,ที่ 2 ,ภาคฤดูร้อน)
-    detail_type_day_class (รายละเอียดช่วงเวลาเรียนของแต่ละภาคการศึกษา)
-        start_class เดือนเริ่มต้นของภาคการศึกษานั้น (เอามาแค่เดือน)
-        end_class เดือนสิ้นสุดของภาคการศึกษานั้น (เอามาแค่เดือน)
+        - curriculumStudySystem เช่น ONSITE / ONLINE / HYBRID
+        - curriculumStudySystemOther ถ้ามีคำอื่นนอกเหนือจากตัวเลือก
 
-    type_class จาก ระบบการศึกษา หมวดที่เจอคำคล้ายๆว่า 'แบบชั้นเรียน (Onsite) หรือแบบทางไกล (Online)' (ส่วนมากจะเป็นช่องให้ติ๊ก เอามาเฉพาะค่าที่ถูกเลือก)
+        - transferCurriculumLevel ระดับหลักสูตรที่รับโอน
+        - transferAcademicYear ปีการศึกษาที่เริ่มใช้
 
-    (ต่อไปจะเป็นรายละเอียดหน่วยกิตทั้งหมด หากมีรูปแบบหน่วยกิตหลายรูปแบบเอามาแค่รูปแบบเดียว)
-    total_credits จํานวนหน่วยกิตรวมตลอดหลักสูตร (เอามาแค่เลข)
+        - curriculumTotalCredits หน่วยกิตรวมทั้งหลักสูตร
+        - minimumCurriculumCredits หน่วยกิตขั้นต่ำ
 
-    detail_credit (รายละเอียดการแจกแจงของหน่วยกิตรวมทั้งหมด)
-    main (รายละเอียดการของหน่วยกิตแต่ละประเภท)
-        value_main หมวดที่เป็น รายละเอียดหลักของหน่วยกิตรวม หมวดที่มักมีคำคล้ายๆว่า 'หมวดวิชาศึกษาทั่วไป หรือ วิชาเฉพาะ หรือ วิชาเลือกเสรี' (และอาจเป็นค่าอื่นๆได้ ส่วนมากจะมี ลำดับของ ว่า เป็น 1,2,3 แต่ไม่เอารายละเอียดของลำดับนั้น โดยให้เอามาแค่ชื่อไม่ต้องเอาลำดับมา)
-        credit_main จำนวนหน่วยกิตของหมวดหลัก
-        detail_main (รายละเอียดของหมวด)
-        sub_main (หมวดย่อยของหมวดหลัก หากมีค่า เป็น 1.1 1.2 2.1 2.2 แต่ถ้าลึกเข้าไปสองขั้นเช่น 2.1.1 2.2.1 อย่างงี้ไม่เอา)
-            value_sub_main ชื่อหมวดย่อย (เอามาแค่ชื่อไม่ต้องเอาลำดับมา)
-            credit_sub_main จำนวนหน่วยกิตของหมวดย่อยนั้น
+        (ต่อไปเป็นโครงสร้างหลักสูตร)
+        - curriculumStructures
+            - courseGroup
+            - courseCredits
+            - subCourseGroups
 
-    (ต่อไปจะเป็นรายละเอียดวิชาที่มีทั้งหมด)
-    course (เก็บรายวิชาทั้งหมดที่มี)
-        course_type รายวิชานี้อยู่ในหมวดใดของโครงสร้างหลักสูตร(ค่าต้องอยู่ใน detail_credit["main"]["value_main"] เท่านั้น และเอามาแค่ค่าเท่านั้นไม่ต้องเอาลำดับมา)
-        sub_course_type รายวิชานี้อยู่ในหมวดย่อย ของหมวดหลัก ใดของโครงสร้างหลักสูตร (ค่าต้องอยู่ใน detail_credit["main"]["detail_main"]["value_sub_main"] ที่อยู่ใน detail_credit["main"]["value_main"] เดียวกันเท่านั้น ส่วนมาก "value_main" มีอยู่ลำดับต้นเช่น 1. 2. "value_sub_main" จะเป็นหัวข้อย่อยเช่น 1.1  2.2 2.3 และเอามาแค่ค่าเท่านั้นไม่ต้องเอาลำดับมา)
-        thai_abv ชื่อรหัสวิชาย่อ ภาษาไทย (format ให้เป็น ตัวย่อภาษาไทย. เลข ในกรณีที่ตัวอักษรกับภาษาแยกกันชัดเจน หากแยกกันไม่ชัดเจนให้ตัวติดกันให้หมด)
-        th_name ชื่อวิชาเต็ม ภาษาไทย
-        credit จำนวนหน่วยกิตเต็มของรายวิชานั้น (เอามาแค่ตัวเลข)
-        credit_detail รายละเอียดของหน่วยกิตรายวิชา (ส่วนมากจะเป็น (เลข-เลข-เลข) บางกรณีอาจเป็น (มากกว่า เลข ชั่วโมง) format ที่ให้เก็บให้เติม '()'ครอบทั้งหมดด้วยหากไม่มี)
-        eng_abv ชื่อรหัสวิชาย่อ ภาษาอังกฤษ (format ให้เป็น ตัวย่อภาษาอังกฤษ เลข ในกรณีที่ตัวอักษรกับภาษาแยกกันชัดเจน หากแยกกันไม่ชัดเจนให้ตัวติดกันให้หมด)
-        eng_name ชื่อวิชาเต็ม ภาษาอังกฤษ
-    """
+        (ต่อไปเป็นตารางรายวิชา)
+        - courses ทุกแถวของตารางรายวิชา
+
+        (ต่อไปเป็นข้อกำหนดทางวิชาการ)
+        - academicRequirements เอาทั้งหมดเรียงลำดับ
+
+        ตัวอย่างข้อมูล
+        {
+            "curriculumId": "c3da8b60-9537-4f85-8b9b-0cc9031af789",
+
+            "educationSystem": "ระบบทวิภาค โดย 1 ปีแบ่งออกเป็น 2 ภาคการศึกษา",
+
+            "isMaxStudyDurationYears": true,
+            "maxStudyDurationYears": "ไม่เกิน 8 ปีการศึกษา",
+
+            "isRegularClassTime": true,
+            "teachingSchedule": [
+                {
+                "sequence": 1,
+                "semesterName": "ภาคเรียนที่ 1",
+                "start": "สิงหาคม",
+                "end": "ธันวาคม"
+                },
+                {
+                "sequence": 2,
+                "semesterName": "ภาคเรียนที่ 2",
+                "start": "มกราคม",
+                "end": "พฤษภาคม"
+                }
+            ],
+
+            "curriculumStudySystem": "ONSITE",
+            "curriculumStudySystemOther": null,
+
+            "transferCurriculumLevel": "BACHELOR",
+            "transferAcademicYear": "2566",
+
+            "curriculumTotalCredits": 135,
+            "minimumCurriculumCredits": 120,
+
+            "curriculumStructures": [
+                {
+                "sequence": 1,
+                "courseGroup": "วิชาศึกษาทั่วไป",
+                "courseCredits": 30,
+                "subCourseGroups": [
+                    {
+                    "subCourseGroup": "วิชาบังคับ",
+                    "credits": 24
+                    },
+                    {
+                    "subCourseGroup": "วิชาเลือก",
+                    "credits": 6
+                    }
+                ]
+                }
+            ],
+
+            "courses": [
+                        {
+                            "sequence": 1,
+                            "courseCodeTh": "ว.ทบ.102",
+                            "courseCodeEn": "CS102",
+                            "courseNameTh": "การเขียนโปรแกรมคอมพิวเตอร์เบื้องต้น",
+                            "courseNameEn": "Introduction to Computer Programming",
+                            "courseDescriptionTh": "รายวิชานี้มุ่งเน้นให้นักศึกษาเข้าใจหลักการเขียนโปรแกรมเบื้องต้น",
+                            "courseDescriptionEn": "This course introduces fundamental concepts of computer programming.",
+                            "credits": 3,
+                            "lecturePracticeSelfStudy": "2-2-5",
+                            "courseGroup": "วิชาศึกษาทั่วไป",
+                            "semester": 1,
+                            "academicYear": 2569
+                        },
+                        {
+                            "sequence": 2,
+                            "courseCodeTh": "วทบ.101",
+                            "courseCodeEn": "CS101",
+                            "courseNameTh": "การเขียนโปรแกรมเบื้องต้น ag1",
+                            "courseNameEn": "Introduction to Programming",
+                            "courseDescriptionTh": "พื้นฐานการเขียนโปรแกรม",
+                            "courseDescriptionEn": "Basic programming concepts",
+                            "credits": 3,
+                            "lecturePracticeSelfStudy": "3-1-5",
+                            "courseGroup": "วิชาศึกษาทั่วไป",
+                            "semester": 1,
+                            "academicYear": 2567
+                        }
+            ],
+
+            "academicRequirements": [
+                {
+                "sequence": 1,
+                "title": "โครงงาน",
+                "detail": "นักศึกษาต้องจัดทำโครงงานก่อนสำเร็จการศึกษา"
+                }
+            ]
+        }
+
+        """
 
     schema = {
         "type": "object",
         "properties": {
-
-            "max_semester": {"type": ["string", "null"]},
-
-            "day_class": {"type": ["string", "null"]},
-            "detail_day_class": {
+            "curriculumId": {"type": ["string", "null"]},
+            "educationSystem": {"type": ["string", "null"]},
+            "isMaxStudyDurationYears": {"type": ["boolean", "null"]},
+            "maxStudyDurationYears": {"type": ["string", "null"]},
+            "teachingSchedule": {
                 "type": ["array", "null"],
                 "items": {
                     "type": "object",
                     "properties": {
-                        "type_day_class": {"type": ["string", "null"]},
-                        "detail_type_day_class": {
-                            "type": ["object", "null"],
-                            "properties": {
-                                "start_class": {"type": ["string", "null"]},
-                                "end_class": {"type": ["string", "null"]},
-                            },
-                            "required": ["start_class","end_class"],
-                        },
+                        "sequence": {"type": "integer"},
+                        "semesterName": {"type": "string"},
+                        "start": {"type": "string"},
+                        "end": {"type": "string"},
                     },
-                    "required": ["type_day_class", "detail_type_day_class"],
+                    "required": ["sequence", "semesterName"],
                 },
             },
-
-            "type_class": {"type": ["string", "null"]},
-
-            "total_credits": {"type": ["integer", "null"]},
-            "detail_credit": {
+            "curriculumStudySystem": {"type": ["string", "null"]},
+            "curriculumStudySystemOther": {"type": ["string", "null"]},
+            "transferCurriculumLevel": {"type": ["string", "null"]},
+            "transferAcademicYear": {"type": ["string", "null"]},
+            "curriculumTotalCredits": {"type": ["integer", "null"]},
+            "minimumCurriculumCredits": {"type": ["integer", "null"]},
+            "curriculumStructures": {
                 "type": ["array", "null"],
                 "items": {
                     "type": "object",
                     "properties": {
-                        "main": {
-                            "type": ["object", "null"],
-                            "properties": {
-                                "value_main": {"type": ["string"]},
-                                "credit_main": {"type": ["number"]},
-                                "detail_main": {
-                                    "type": ["object"],
-                                    "properties": {
-                                        "sub_main": {
-                                            "type": ["array", "null"],
-                                            "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "value_sub_main": {"type": ["string", "null"]},
-                                                    "credit_sub_main": {"type": ["number", "null"]},
-                                                },
-                                                "required": ["value_sub_main", "credit_sub_main"],
-                                            },
-                                        },
-                                    },
-                                    "required": [],
+                        "sequence": {"type": "integer"},
+                        "courseGroup": {"type": "string"},
+                        "courseCredits": {"type": "integer"},
+                        "subCourseGroups": {
+                            "type": ["array", "null"],
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "subCourseGroup": {"type": "string"},
+                                    "credits": {"type": "integer"},
                                 },
+                                "required": ["subCourseGroup", "credits"],
                             },
-                            "required": ["value_main","detail_main"],
                         },
                     },
-                    "required": [],
+                    "required": ["sequence", "courseGroup"],
                 },
             },
-            
-            "course": {
+            "courses": {
                 "type": ["array", "null"],
                 "items": {
                     "type": "object",
                     "properties": {
-                        "course_type": {"type": ["string", "null"]},
-                        "sub_course_type": {"type": ["string", "null"]},
-                        "thai_abv": {"type": ["string", "null"]},
-                        "th_name": {"type": ["string", "null"]},
-                        "credit": {"type": ["number", "null"]},
-                        "credit_detail": {"type": ["string", "null"]},
-                        "eng_abv": {"type": ["string", "null"]},
-                        "eng_name": {"type": ["string", "null"]},
+                        "sequence": {"type": "integer"},
+                        "courseCodeTh": {"type": ["string", "null"]},
+                        "courseCodeEn": {"type": ["string", "null"]},
+                        "courseNameTh": {"type": ["string", "null"]},
+                        "courseNameEn": {"type": ["string", "null"]},
+                        "courseDescriptionTh": {"type": ["string", "null"]},
+                        "courseDescriptionEn": {"type": ["string", "null"]},
+                        "credits": {"type": ["integer", "null"]},
+                        "lecturePracticeSelfStudy": {"type": ["string", "null"]},
+                        "courseGroup": {"type": ["string", "null"]},
+                        "semester": {"type": ["integer", "null"]},
+                        "academicYear": {"type": ["integer", "null"]},
                     },
-                    "required": [],
-                    "additionalProperties": False,
+                    "required": ["sequence"],
+                },
+            },
+            "academicRequirements": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "sequence": {"type": "integer"},
+                        "title": {"type": "string"},
+                        "detail": {"type": ["string", "null"]},
+                    },
+                    "required": ["sequence", "title"],
                 },
             },
         },
-        "required": [],
+        "additionalProperties": False,
     }
 
     return schema, prompt

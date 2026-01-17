@@ -1,113 +1,210 @@
-def schema_prompt(chunk_pdf_bytes: bytes=None):
+def schema_prompt(chunk_pdf_bytes: bytes | None = None):
 
+    prompt = """
+    จากไฟล์ PDF ที่ให้มา ให้ทำการ extract ข้อมูลโดยเรียงจากบนลงล่างตามลำดับที่ปรากฏในเอกสาร
+    ห้ามอธิบาย ห้ามใส่ข้อความอื่นใด
+    ให้ตอบเป็น JSON อย่างเดียว และต้องเป็นไปตามโครงสร้างที่กำหนดเท่านั้น
+    หากไม่พบข้อมูล ให้ใส่ค่าเป็น null หรือ false ตามชนิดข้อมูล
+    curriculumId ให้ค่าเป็น null
+    approvalStatus ให้ค่าเป็น in-progress
+    """
 
-    prompt = """จากในไฟล์ที่ทำการ extract เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-        ข้อมูลจากหมวดที่ 1
-
-        faculty มาจาก คณะ/วิทยาลัย/สถาบัน โดยถ้าไม่มีบอกว่าเป็นคณะ/วิทยาลัย/สถาบัน ให้เติมคำว่าคณะนำหน้าเลย และคำต่อท้ายต่างๆเช่นศูนย์/หรือร่วมมือกับสถาบันใดๆไม่ต้องเอามา,
-
-        curr_id รหัสหลักสูตร,
-
-        curr_name_th ชื่อหลักสูตรภาษาไทย,
-
-        curr_name_en ชื่อหลักสูตรภาษาอังกฤษ,
-
-        degree_full_th ชื่อปริญญาและสาขาวิชาภาษาไทยชื่อเต็ม,
-
-        degree_full_en ชื่อปริญญาและสาขาวิชาภาษาอังกฤษชื่อเต็ม,
-
-        degree_abr_th ชื่อปริญญาและสาขาวิชาภาษาไทยชื่อย่อ,
-
-        degree_abr_en ชื่อปริญญาและสาขาวิชาภาษาอังกฤษชื่อย่อ,
-
-        main_subject คือวิชาเอกด้วยจะมีหลายค่า
-            main_thai คือชื่อวิชาเอกที่เป็นภาษาไทย
-            main_eng คือชื่อวิชาเอกที่เป้นภาษาอังกฤษ
-
-        (ในนี้จะอาจจะมีช่องติ้กที่ถูกเลือกโดยให้ดูจากหลายๆหมวดแล้วตีความว่า ตัวอักษรพิเศษที่คุณเห็นตัวไหนเป็นตัวเลือกติ้กถูก โดยส่วนมากๆในหลายๆหมวด ตัวที่ถูกติ๊กถูกจะน้อยกว่าค่าที่ไม่ได้ถูกติ๊ก หากมีการติ้กหลายค่าในหมวดเดียวกันให้ เอาค่าที่ถูกเลือกใช้ ", " คั่นเพื่อบอกว่ามีหลายค่า)
-        curr_category รูปแบบ หมวดที่เจอคำคล้ายๆว่า 'หลักสูตรระดับปริญญาตรี 4 ปี หรือต่อเนื่อง' (เอามาเฉพาะค่าที่ถูกเลือก),
-        curr_type ประเภทของหลักสูตร หมวดที่เจอคำคล้ายๆว่า 'หลักสูตรระดับปริญญาตรีทาวิชาการ หรือหลักสูตรปริญญาตรีแบบก้าวหน้าทางวิชาการ หรือทางวิชาชีพหรือปฏิบัติการ หรือแบบก้าวหน้าทางวิชาชีพหรือปฏิบัติการ' (เอามาเฉพาะค่าที่ถูกเลือก),
-        lang ภาษาที่ใช้ หมวดที่เจอคำคล้ายๆว่า 'จัดการศึกษาเป็นภาษาไทย' (เอามาเฉพาะค่าที่ถูกเลือก และถูกเลือกเป้นภาษาต่างประเทศ หรือมีหลายภาษาให้ใช้ ", " แล้วเลือกใน ภาษาต่างประเทศเลย),
-        mou ความร่วมมือกับสถาบันอื่น เป็นหมวดที่เจอคำคล้ายๆว่า 'เป็นหลักสูตรของสถาบันโดยเฉพาะ' (เอามาเฉพาะค่าที่ถูกเลือก),
-        graduate_degree การให้ปริญญาแก่ผู้สําเร็จการศึกษา เป็นหมวดที่เจอคำคล้ายๆว่า 'ให้ปริญญาเพียงสาขาวิชาเดียว หรือ มากกว่า 1 สาขาวิชา' (เอามาเฉพาะค่าที่ถูกเลือก),
-        
-        (ในนี้จะเป็นข้อมูลจากหมวด ให้ปริญญาเพียงสาขาวิชาเดียว)
-        new_curr_year คือปีที่ของหลักสูตรนี้ อยู่บนสุด,
-        first_open_semester จาก กําหนดเปิดสอนใน ให้เอาเลขภาคการศึกษาที่เปิดสอนมาใส่,
-        first_open_year จาก กําหนดเปิดสอนใน ให้เอาเลขปีการศึกษาที่เปิดสอนมาใส่,
-        convoke_scrutinize_academic จาก ได้พิจารณากลั่นกรองโดยคณะกรรมการนโยบายวิชาการ ให้เอาครั้งที่มีการประชุม(รวมถึง /ปีที่ทำการประชุม มาด้วย),
-        date_scrutinize_academic จาก ได้พิจารณากลั่นกรองโดยคณะกรรมการนโยบายวิชาการ ให้เอาวันเดือนปีที่เห็นมาใส่,
-        convoke_approve_college จาก ได้รับอนุมัติ/เห็นชอบหลักสูตรจากสภามหาวิทยาลัย ให้เอาครั้งที่มีการประชุม(รวมถึง /ปีที่ทำการประชุม มาด้วย),
-        date_approve_college จาก ได้รับอนุมัติ/เห็นชอบหลักสูตรจากสภามหาวิทยาลัย ให้เอาวันเดือนปีที่เห็นมาใส่,
-        convoke_approve_profession จาก ได้รับอนุมัติ/เห็นชอบหลักสูตรจากสภาวิชาชีพ(ขึ้นอยู่กับวิชาชีพของหลักสูตรนี้) ให้เอาครั้งที่มีการประชุม(รวมถึง /ปีที่ทำการประชุม มาด้วย),
-        date_approve_profession ได้รับอนุมัติ/เห็นชอบหลักสูตรจากสภาวิชาชีพ(ขึ้นอยู่กับวิชาชีพของหลักสูตรนี้) ให้เอาวันเดือนปีที่เห็นมาใส่,
-
-        careers จาก อาชีพที่สามารถประกอบได้หลังสำเร็จการศึกษา (ไม่เอาลำดับข้อ หากมีหลายตัวอยากให้ใช้ ,),
-        campus จาก สถานที่จัดการเรียนการสอน (เอามาเฉพาะค่าที่ถูกเลือก หากมีหลายตัวอยากให้ใช้ ,),
-        expense_type จาก ประเภทโครงการ เป็นหมวดที่เจอคำคล้ายๆว่า 'โครงการปกติ โครงการพิเศษ' (เอามาเฉพาะค่าที่ถูกเลือก ),
-
-        cost_thai จาก ค่าใช้จ่ายตลอดหลักสูตร ของ นักศึกษาไทย (เอามาแค่เลข และหลากมีหลายรูปแบบเอาจากรูปแบบแรกที่เจอ),
-        cost_foreign จาก ค่าใช้จ่ายตลอดหลักสูตร ของ นักศึกษาต่างชาติ (เอามาแค่เลข และหลากมีหลายรูปแบบเอาจากรูปแบบแรกที่เจอ),
-
-        (สามอันนี้มาจาก 1 สถานการณ์ภายนอกหรือการพัฒนาที่จําเป็นต้องนํามาพิจารณาในการวางแผนพัฒนาหลักสูตร)
-        responde_policy จาก การตอบสนองต่อนโยบายและยุทธศาสตร์ชาติ (ให้เอาข้อความมาทั้งหมด),
-        responde_industry จาก การตอบสนองต่อยุทธศาสตร์การพัฒนาอุตสาหกรรมไทย (ให้เอาข้อความมาทั้งหมด),
-        reponde_sdg จาก การตอบสนองต่อเป้าหมายการพัฒนาที่ยั่งยืนขององค์การสหประชาชาติ SDG (ให้เอาข้อความมาทั้งหมด),
-
-        accord_vision จาก 2)ความสอดคล้องกับวิสัยทัศน์ ยุทธศาสตร์ และพันธกิจของสถาบัน (ให้เอาข้อความมาทั้งหมด),
-        requirement_stakeholder จาก 3)ความต้องการและความคาดหวังของผู้มีส่วนได้ส่วนเสีย (ให้เอาข้อความมาทั้งหมด),
-        """
-
+    plan_object_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "isPlan": {"type": "boolean"},
+            "isThesisOnly": {"type": "boolean"},
+            "isCourseworkAndThesis": {"type": "boolean"},
+            "isPlan11": {"type": "boolean"},
+            "isPlan12": {"type": "boolean"},
+            "isPlan21": {"type": "boolean"},
+            "isPlan22": {"type": "boolean"},
+        },
+        "required": [
+            "isPlan",
+            "isThesisOnly",
+            "isCourseworkAndThesis",
+            "isPlan11",
+            "isPlan12",
+            "isPlan21",
+            "isPlan22",
+        ],
+    }
 
     schema = {
         "type": "object",
-        "properties": {
-            "faculty": {"type": ["string", "null"]},
-            "curr_id": {"type": ["string", "null"]},
-            "curr_name_th": {"type": ["string", "null"]},
-            "curr_name_en": {"type": ["string", "null"]},
-            "degree_full_th": {"type": ["string", "null"]},
-            "degree_full_en": {"type": ["string", "null"]},
-            "degree_abr_th": {"type": ["string", "null"]},
-            "degree_abr_en": {"type": ["string", "null"]},
-            "main_subject":{
-                "type":["array","null"],
-                "items":{
-                    "type":["object","null"],
-                    "properties":{
-                        "main_thai":{"type":["string","null"]},
-                        "main_eng":{"trpe":["string","null"]}
-                    }
-                }
-            },
-            "curr_category": {"type": ["string", "null"]},
-            "curr_type": {"type": ["string", "null"]},
-            "lang": {"type": ["string", "null"]},
-            "mou": {"type": ["string", "null"]},
-            "graduate_degree": {"type": ["string", "null"]},
-            "new_curr_year": {"type": ["integer", "null"]},
-            "first_open_semester": {"type": ["integer", "null"]},
-            "first_open_year": {"type": ["integer", "null"]},
-            "convoke_scrutinize_academic": {"type": ["string", "null"]},
-            "date_scrutinize_academic": {"type": ["string", "null"]},
-            "convoke_approve_college": {"type": ["string", "null"]},
-            "date_approve_college": {"type": ["string", "null"]},
-            "convoke_approve_profession": {"type": ["string", "null"]},
-            "date_approve_profession": {"type": ["string", "null"]},
-            "careers": {"type": ["string", "null"]},
-            "campus": {"type": ["string", "null"]},
-            "expense_type": {"type": ["string", "null"]},
-            "cost_thai": {"type": ["string", "null"]},
-            "cost_foreign": {"type": ["string", "null"]},
-            "responde_policy": {"type": ["string", "null"]},
-            "responde_industry": {"type": ["string", "null"]},
-            "reponde_sdg": {"type": ["string", "null"]},
-            "accord_vision": {"type": ["string", "null"]},
-            "requirement_stakeholder": {"type": ["string", "null"]},
-        },
         "additionalProperties": False,
-        "required": []
-    }
+        "properties": {
+            "curriculumId": {"type": ["string", "null"]},
 
+            "approvalStatus": {
+                "type": "string",
+                "enum": ["approved", "in-progress", "rejected", "cancelled", "other"],
+            },
+            "institutionName": {"type": ["string", "null"]},
+            "facultyName": {"type": ["string", "null"]},
+            "facultyCode": {"type": ["string", "null"]},
+            "approvalDate": {"type": ["string", "null"], "format": "date-time"},
+            "startDate": {"type": ["string", "null"], "format": "date-time"},
+
+            "curriculumCodeTh": {"type": ["string", "null"]},
+            "curriculumNameTh": {"type": ["string", "null"]},
+            "curriculumCodeEn": {"type": ["string", "null"]},
+            "curriculumNameEn": {"type": ["string", "null"]},
+
+            "degreeAbbrTh": {"type": ["string", "null"]},
+            "degreeFullTh": {"type": ["string", "null"]},
+            "degreeAbbrEn": {"type": ["string", "null"]},
+            "degreeFullEn": {"type": ["string", "null"]},
+
+            "majorsData": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        "majorTh": {"type": ["string", "null"]},
+                        "majorEn": {"type": ["string", "null"]},
+                    },
+                },
+            },
+
+            "curriculumLevel": {
+                "type": "string",
+                "enum": ["bachelor", "master", "doctor"],
+            },
+            "curriculumFormat": {
+                "type": "string",
+                "enum": [
+                    "continuing",
+                    "1-years",
+                    "2-years",
+                    "3-years",
+                    "4-years",
+                    "5-years",
+                    "6-years",
+                ],
+            },
+
+            "curriculumType": {
+                "type": ["string", "null"],
+                "enum": [
+                    "academic",
+                    "progressive-academic",
+                    "professional",
+                    "progressive-professional",
+                    None,
+                ],
+            },
+            "curriculumCategory": {
+                "type": ["string", "null"],
+                "enum": [
+                    "single-discipline",
+                    "multidisciplinary",
+                    "interdisciplinary",
+                    "masters-doctor-same-field",
+                    None,
+                ],
+            },
+
+            # ✅ inline plan schema
+            "plan1": plan_object_schema,
+            "plan2": plan_object_schema,
+
+            "instructionLanguage": {
+                "type": "string",
+                "enum": ["thai", "english", "both", "other"],
+            },
+            "instructionLanguageOther": {"type": ["string", "null"]},
+
+            "admissionType": {
+                "type": "string",
+                "enum": [
+                    "thai-only",
+                    "thai-and-international",
+                    "thai-and-international-with-thai-proficiency",
+                ],
+            },
+
+            "isJointProgram": {"type": "boolean"},
+            "jointInstitutionName": {"type": ["string", "null"]},
+
+            "degreeConferralType": {
+                "type": "string",
+                "enum": ["single", "multiple"],
+            },
+
+            "curriculumYear": {"type": ["integer", "null"]},
+            "openSemester": {"type": ["integer", "null"]},
+            "openAcademicYear": {"type": ["integer", "null"]},
+
+            "approvedByPolicyCommitteeMeetingNumber": {"type": ["string", "null"]},
+            "approvedByPolicyCommitteeDate": {
+                "type": ["string", "null"],
+                "format": "date-time",
+            },
+
+            "approvedByUniversityCouncilMeetingNumber": {"type": ["string", "null"]},
+            "approvedByUniversityCouncilDate": {
+                "type": ["string", "null"],
+                "format": "date-time",
+            },
+
+            "approvedByProfessionalCouncilMeetingNumber": {"type": ["string", "null"]},
+            "approvedByProfessionalCouncilDate": {
+                "type": ["string", "null"],
+                "format": "date-time",
+            },
+
+            "careerPaths": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+
+            "instructionLocations": {
+                "type": ["string", "null"],
+                "enum": ["tha-phra-chan", "pattaya", "rangsit", "lampang", None],
+            },
+
+            "projectType": {
+                "type": "string",
+                "enum": ["normal", "special", "both"],
+            },
+            "isCostThaiStudent": {"type": "boolean"},
+            "costThaiStudent": {"type": ["integer", "null"]},
+            "isCostInternationalStudent": {"type": "boolean"},
+            "costInternationalStudent": {"type": ["integer", "null"]},
+
+            "nationalPolicyStrategy2561_2580": {"type": ["string", "null"]},
+            "industry4_0Strategy2560_2579": {"type": ["string", "null"]},
+            "sdgAlignment": {"type": ["string", "null"]},
+            "institutionalAlignment": {"type": ["string", "null"]},
+            "stakeholderExpectations": {"type": ["string", "null"]},
+
+            "broadField": {"type": ["string", "null"]},
+            "narrowField": {"type": ["string", "null"]},
+            "detailField": {"type": ["string", "null"]},
+
+            "remark": {"type": ["string", "null"]},
+        },
+
+        "required": [
+            "curriculumId",
+            "approvalStatus",
+            "curriculumLevel",
+            "curriculumFormat",
+            "instructionLanguage",
+            "admissionType",
+            "isJointProgram",
+            "degreeConferralType",
+            "projectType",
+            "isCostThaiStudent",
+            "isCostInternationalStudent",
+            "careerPaths",
+            "plan1",
+            "plan2",
+        ],
+    }
 
     return schema, prompt
