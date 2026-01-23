@@ -1,10 +1,16 @@
+load_dotenv()
+
 from fn_gemini import call_openrouter_pdf
 from fn_slice_page_pdf import slice_pdf_pages
 from fn_pdf_to_byte import to_pdf_bytes
 from fn_chunk_number import locate_chunks
 import os
 import json
+OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
+MODEL = os.getenv("MODEL")
 
+
+#####
 from dotenv import load_dotenv
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -14,19 +20,13 @@ import re
 from typing import Any, Dict
 from pathlib import Path
 from done.read_text import extract_page_text_as_debug_string
-
-
 list_pdf = ["""
 https://drive.google.com/file/d/1Z_0zWJQQCrjyEvivrt1lr4ys6FmfkMmO/edit
                                                                                                                   
             """
 ]
-
-load_dotenv()
 drive_url = os.getenv("DRIVE_URL")
 sa_path = "service_account.json"
-OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
-MODEL = os.getenv("MODEL")
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 creds = service_account.Credentials.from_service_account_file(str(sa_path), scopes=SCOPES)
 drive = build("drive", "v3", credentials=creds, cache_discovery=False)
@@ -50,6 +50,7 @@ def download_drive_pdf_bytes(drive, file_id: str) -> bytes:
     while not done:
         _, done = downloader.next_chunk()
     return fh.getvalue()
+#####
 
 
 def reorder_by_schema(data: Any, schema: Dict[str, Any]) -> Any:
