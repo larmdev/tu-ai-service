@@ -34,22 +34,23 @@ def schema_prompt(chunk_pdf_bytes: bytes | None = None):
         """
 
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-ข้อมูลจากหมวดที่ 
+ข้อมูลจากหมวดที่ 3
 
 curriculumId
 
-educationalPhilosophy
+educationalPhilosophy ปรัชญาการศึกษา
 
-curriculumObjectives
+curriculumObjectives วัตถุประสงค์ของหลักสูตร
 
-programLearningOutcomes
-  curriculumPlan
+จากหัวข้อ ผลลัพธ์การเรียนรู้ระดับหลักสูตร (Program–level Learning Outcomes: PLOs)
+programLearningOutcomes 
+  curriculumPlan แผนการศึกษา (หากไม่มีการบอกมีหลายรูปแบบให้ค่าเป็น 'แผนการศึกษาที่ 1')
   plos
-    ploCode
-    ploText
-    subPlos
-      subPloCode
-      subPloText
+    ploCode เช่น plo1 ,k2 ,plo-2 (format #อักษรอักฤษตัวใหญ่#เลข เช่น PLO1, K1, PLO2)
+    ploText รายละเอียดของแต่ละตัว
+    subPlos หากมีการบอกลายละเอียดย่อยของแต่ละ plo เช่น plo2-1 หากไม่มีให้ใช้ null
+      subPloCode เช่น plo1-1 ,k2-2 ,plo2.2 (format #อักษรอักฤษตัวใหญ่#เลข-#เลขย่อย เช่น PLO1-1, K1-2, PLO2-2)
+      subPloText รายละเอียดของแต่ละตัว
     """
 
     schema = {

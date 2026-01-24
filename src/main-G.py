@@ -31,16 +31,49 @@ class ChunkRequest(BaseModel):
     fileName: Optional[str] = None
 
 
-async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId, fileName):
+async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId, fileName, start_chunk_page):
     try:
 
         # กำหนด schema & prompt
+        if chunk_idx == 4 :
+            continue
+
         schema, prompt = None, None
         if chunk_idx == 0:
             from fn_chunk1 import schema_prompt
             schema, prompt = schema_prompt()
+
         elif chunk_idx == 1:
             from fn_chunk2 import schema_prompt
+            schema, prompt = schema_prompt()
+
+        elif chunk_idx == 2:
+            from fn_chunk3 import schema_prompt
+            schema, prompt = schema_prompt()
+
+        elif chunk_idx == 3:
+            from fn_chunk4 import schema_prompt
+            schema, prompt = schema_prompt()
+
+        elif chunk_idx == 5:
+            # กลับมาเริ่ม fn_chunk5 ตามที่คุณต้องการ
+            from fn_chunk5 import schema_prompt
+            schema, prompt = schema_prompt()
+
+        elif chunk_idx == 6:
+            from fn_chunk6 import schema_prompt
+            schema, prompt = schema_prompt()
+
+        elif chunk_idx == 7:
+            from fn_chunk7 import schema_prompt
+            schema, prompt = schema_prompt()
+
+        elif chunk_idx == 8:
+            from fn_chunk8 import schema_prompt
+            schema, prompt = schema_prompt()
+
+        elif chunk_idx == 9:
+            from fn_chunk9 import schema_prompt
             schema, prompt = schema_prompt()
 
         # ตัด PDF
@@ -50,7 +83,7 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             end_page=end_page
         )
 
-        # เextract data
+        # extract data
         data = call_openrouter_pdf(
             api_key=OPEN_ROUTER_KEY,
             model=MODEL,
@@ -61,18 +94,46 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             temperature=0.00,
         )
 
-        # เตรียม Payload
+        elif chunk_idx == 3:
+            from fn_chunk4_2 import schema_prompt
+            schema, prompt = schema_prompt()
+            chunk_pdf_bytes = slice_pdf_pages(
+                pdf_bytes=pdf_bytes,
+                start_page=start_chunk_page[4],
+                end_page=start_chunk_page[5]
+            )
+            data2 = call_openrouter_pdf(
+                api_key=OPEN_ROUTER_KEY,
+                model=MODEL,
+                prompt=prompt,
+                schema=schema,
+                pdf_bytes=chunk_pdf_bytes,
+                engine="pdf-text",
+                temperature=0.00,
+            )
+
+
+        ####### regex 1-9
+        
+        if chunk_idx >= 4 :
+            plusnum = 0
+        else :
+            plusnum = 1
+
+        section = str(chunk_idx + plusnum)
+
         payload = {
             "refId": refId,
             "fileName": fileName,
-            "chunk": f"chunk{chunk_idx + 1}",
+            "chunk": f"chunk{section}",
             "data": data
         }
-
+        
+        CALLBACK_URL = CALLBACK_URL + section
         # ยิง Callback
         async with httpx.AsyncClient() as client:
             resp = await client.post(CALLBACK_URL, json=payload, timeout=60.0)
-            print(f"Callback Chunk {chunk_idx+1} Status: {resp.status_code}")
+            print(f"Callback Chunk {section} Status: {resp.status_code}")
 
     except Exception as e:
         print(f"Error processing chunk {chunk_idx+1}: {e}")
@@ -98,6 +159,7 @@ async def background_manager(body: ChunkRequest, pdf_bytes: bytes):
             pdf_bytes=pdf_bytes,
             refId=body.refId,
             fileName=body.fileName
+            start_chunk_page=start_chunk_page
         )
         tasks.append(task)
 
