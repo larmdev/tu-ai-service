@@ -9,6 +9,103 @@ def schema_prompt(chunk_pdf_bytes: bytes | None = None):
     approvalStatus ให้ค่าเป็น in-progress
     """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+approvalStatus
+
+institutionName
+facultyName
+facultyCode
+
+approvalDate
+startDate
+
+curriculumCodeTh
+curriculumNameTh
+curriculumCodeEn
+curriculumNameEn
+
+degreeAbbrTh
+degreeFullTh
+degreeAbbrEn
+degreeFullEn
+
+majorsData
+  majorTh
+  majorEn
+
+curriculumLevel
+curriculumFormat
+curriculumType
+curriculumCategory
+
+plan1
+  isPlan
+  isThesisOnly
+  isCourseworkAndThesis
+  isPlan11
+  isPlan12
+  isPlan21
+  isPlan22
+
+plan2
+  isPlan
+  isThesisOnly
+  isCourseworkAndThesis
+  isPlan11
+  isPlan12
+  isPlan21
+  isPlan22
+
+instructionLanguage
+instructionLanguageOther
+
+admissionType
+
+isJointProgram
+jointInstitutionName
+
+degreeConferralType
+
+curriculumYear
+openSemester
+openAcademicYear
+
+approvedByPolicyCommitteeMeetingNumber
+approvedByPolicyCommitteeDate
+
+approvedByUniversityCouncilMeetingNumber
+approvedByUniversityCouncilDate
+
+approvedByProfessionalCouncilMeetingNumber
+approvedByProfessionalCouncilDate
+
+careerPaths
+
+instructionLocations
+
+projectType
+isCostThaiStudent
+costThaiStudent
+isCostInternationalStudent
+costInternationalStudent
+
+nationalPolicyStrategy2561_2580
+industry4_0Strategy2560_2579
+sdgAlignment
+institutionalAlignment
+stakeholderExpectations
+
+broadField
+narrowField
+detailField
+
+remark
+    """
+
     plan_object_schema = {
         "type": "object",
         "additionalProperties": False,

@@ -49,6 +49,64 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         - คุณวุฒิ (หลายรายการได้)
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+curriculumNameG6
+
+physicalReadiness
+classroom
+laboratory
+learningFacilities
+otherPhysicalReadiness
+
+academicWorksSummaries
+researchCount
+academicWorkCount
+totalAcademicWorks
+fullTimeLecturerCount
+researchRatio
+otherWorkRatio
+overallRatio
+
+thesisAdvisors
+advisorName
+maxStudents
+currentStudents
+availableSlots
+
+graduateProductionCost
+name
+amount
+
+educationIncome
+name
+amount
+
+breakEvenAnalysis
+revenuePerStudent
+costPerStudent
+breakEvenStudentCount
+
+managementReadiness
+lecturerCount
+staffCount
+teachingSkillDevelopment
+professionalSkillDevelopment
+
+courseLecturers
+  fullName
+  position
+  courseRole
+  qualifications
+    degree
+    major
+    institute
+    graduationYearBe
+    """
+
     schema = {
         "type": "object",
         "properties": {

@@ -131,6 +131,63 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
 
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+educationSystem
+
+isMaxStudyDurationYears
+
+maxStudyDurationYears
+
+teachingSchedule
+  sequence
+  semesterName
+  start
+  end
+
+curriculumStudySystem
+
+curriculumStudySystemOther
+
+transferCurriculumLevel
+
+transferAcademicYear
+
+curriculumTotalCredits
+
+minimumCurriculumCredits
+
+curriculumStructures
+  sequence
+  courseGroup
+  courseCredits
+  subCourseGroups
+    subCourseGroup
+    credits
+
+courses
+  sequence
+  courseCodeTh
+  courseCodeEn
+  courseNameTh
+  courseNameEn
+  courseDescriptionTh
+  courseDescriptionEn
+  credits
+  lecturePracticeSelfStudy
+  courseGroup
+  semester
+  academicYear
+
+academicRequirements
+  sequence
+  title
+  detail
+    """
+
     schema = {
         "type": "object",
         "properties": {

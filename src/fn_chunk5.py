@@ -30,6 +30,60 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         7. โครงงาน / วิจัย / วิทยานิพนธ์ (ถ้ามี)
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+studentCharacteristicDevelopment
+  generalCharacteristics
+    description
+    relatedPlos
+  professionalCharacteristics
+    description
+    relatedPlos
+
+ploStandardAlignment
+  ploCode
+  isGeneric
+  isSpecific
+  bloomDomain
+  bloomLevel
+  hasKnowledge
+  hasSkill
+  hasEthics
+  hasCharacter
+
+ploTeachingAssessment
+  ploCode
+  teachingStrategy
+  assessmentMethod
+
+curriculumMapping
+  courseGroup
+  courses
+    subCourseGroup
+    credits
+    yearLevel
+    plos
+
+yearEndLearningOutcomeExpectations
+  yearLevel
+  expectations
+    expectation
+    plos
+
+fieldExperience
+  period
+  preparation
+  assessment
+
+projectResearchRequirement
+  period
+  preparation
+  assessment
+    """
+
     schema = {
         "type": "object",
         "properties": {

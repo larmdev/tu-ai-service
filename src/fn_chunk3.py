@@ -33,6 +33,25 @@ def schema_prompt(chunk_pdf_bytes: bytes | None = None):
         ตรง ploCode ให้เริ่มด้วย PLO1, PLO2, .. PLOn ตามลำดับ
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+educationalPhilosophy
+
+curriculumObjectives
+
+programLearningOutcomes
+  curriculumPlan
+  plos
+    ploCode
+    ploText
+    subPlos
+      subPloCode
+      subPloText
+    """
+
     schema = {
         "type": "object",
         "properties": {

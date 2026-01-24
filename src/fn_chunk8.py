@@ -33,6 +33,33 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         9. การควบคุมคุณภาพด้านจำนวนนักศึกษา
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+curriculumPlanningAndDevelopment
+
+curriculumQualityControl
+standardCriteria
+curriculumManagement
+details
+
+curriculumQualityAssurance
+
+annualCurriculumImprovement
+
+annualCurriculumQualityIndicators
+
+stakeholderNeeds
+
+learningOutcomeResults
+
+courseLecturerQuality
+
+studentCountQuality
+    """
+
     schema = {
         "type": "object",
         "properties": {

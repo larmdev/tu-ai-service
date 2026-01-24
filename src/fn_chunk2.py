@@ -43,6 +43,31 @@ def schema_prompt(chunk_pdf_bytes: bytes=None):
             - จากหัวข้อ "กลยุทธ์ในการดำเนินการเพื่อแก้ไขปัญหา/ข้อจำกัด"
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+admissionType2
+
+admissionQualifications
+
+admissionSelectionProcess
+
+studentsPerYear
+
+studentAdmissionPlans
+  planName
+  amount
+  rows
+    sequence
+    rowType
+    years
+
+firstYearStudentProblems
+
+studentLimitationStrategies
+    """
 
     schema = {
         "type": "object",

@@ -24,6 +24,32 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         - ระบุชื่อจุดอ่อน และรายละเอียด
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+courseTeachingEffectiveness
+
+teachingManagementEvaluation
+
+overallCurriculumEvaluation
+
+curriculumImplementationEvaluation
+
+curriculumReviewAndImprovement
+
+curriculumImprovementStrengths
+sequence
+name
+detail
+
+curriculumImprovementWeaknesses
+sequence
+name
+detail
+    """
+
     schema = {
         "type": "object",
         "properties": {

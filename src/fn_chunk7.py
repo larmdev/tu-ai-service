@@ -24,6 +24,20 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         - คุณลักษณะหรือเงื่อนไขอื่น ๆ
         """
 
+    prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
+ข้อมูลจากหมวดที่ 
+
+curriculumId
+
+learningAssessment
+
+standardVerificationProcess
+
+appealProcess
+
+graduationCriteria
+    """
+
     schema = {
         "type": "object",
         "properties": {
