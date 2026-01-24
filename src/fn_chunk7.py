@@ -25,17 +25,17 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         """
 
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-ข้อมูลจากหมวดที่ 
+ข้อมูลจากหมวดที่ 7
 
 curriculumId
 
-learningAssessment
+learningAssessment การประเมินผลการเรียนรู้ของนักศึกษา
 
-standardVerificationProcess
+standardVerificationProcess กระบวนการทวนสอบมาตรฐานผลสัมฤทธิ์ของนักศึกษา
 
-appealProcess
+appealProcess การอุทธรณ์ผลการศึกษาของนักศึกษา
 
-graduationCriteria
+graduationCriteria เกณฑ์การสําเร็จการศึกษาตามหลักสูตร
     """
 
     schema = {

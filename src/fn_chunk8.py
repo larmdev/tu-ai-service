@@ -34,30 +34,28 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         """
 
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-ข้อมูลจากหมวดที่ 
+ข้อมูลจากหมวดที่ 8
 
 curriculumId
 
-curriculumPlanningAndDevelopment
+อยู่ในหัวข้อ การจัดการคุณภาพหลักสูตร
+curriculumPlanningAndDevelopment การวางแผนและพัฒนาหลักสูตร
+curriculumQualityControl ตาราง ข้อหัวข้อ การควบคุมคุณภาพหลักสูตร หลักสูตรฯ กําหนดการวิธีการวัดคุณภาพหลักสูตรฯ ซึ่งมี 2 column 'คุณภาพ' และ 'วิธีการวัด'
+    standardCriteria ค่า วิธีการวัด ในค่าที่ คุณภาพ เป็น ด้านเกณฑ์มาตรฐานหลักสูตร
+    curriculumManagement ค่า วิธีการวัด ในค่าที่ คุณภาพ เป็น ด้านการบริหารหลักสูตร
+    details หลักสูตรฯ ได้มีผู้เกี่ยวข้องกับการควบคุมคุณภาพหลักสูตร (ข้อความใต้ตารางในหัวข้อทั้งหมด)
+curriculumQualityAssurance การประกันคุณภาพหลักสูตร
+annualCurriculumImprovement การพัฒนา/ปรับปรุงหลักสูตรประจําปี
 
-curriculumQualityControl
-standardCriteria
-curriculumManagement
-details
 
-curriculumQualityAssurance
+annualCurriculumQualityIndicators อยู่ในหัวข้อ ตัวชี้วัดคุณภาพหลักสูตรฯ ด้านเกณฑ์มาตรฐานหลักสูตร ประจําปี
 
-annualCurriculumImprovement
 
-annualCurriculumQualityIndicators
-
-stakeholderNeeds
-
-learningOutcomeResults
-
-courseLecturerQuality
-
-studentCountQuality
+อยู่ในหัวข้อ การบริหารความเสี่ยง
+stakeholderNeeds ด้านความต้องการของผู้มีส่วนได้ส่วนเสีย
+learningOutcomeResults ด้านผลลัพธ์การเรียนรู้ระดับรายวิชา/ชุดวิชาและระดับหลักสูตร
+courseLecturerQuality ด้านอาจารย์ผู้รับผิดชอบหลักสูตร/อาจารย์ประจําหลักสูตร
+studentCountQuality ด้านจํานวนนักศึกษา
     """
 
     schema = {
