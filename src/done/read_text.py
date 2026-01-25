@@ -11,9 +11,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 # ✅ ใส่ URL ของไฟล์ PDF ตรงนี้ (ไม่ใช่โฟลเดอร์)
-PDF_URL = "https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit"
-page_to_check = 54
-
+PDF_URL = "https://drive.google.com/file/d/1I9qBUchBydejWwGgbkpC-IdZFvfg61G-/edit"
+page_to_check = 78
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 
@@ -88,7 +87,21 @@ if __name__ == "__main__":
     if drive_url:
         print("[INFO] DRIVE_URL from .env =", drive_url)
 
-    sa_path = Path("service_account.json")
+    script_dir = Path(__file__).resolve().parent
+        
+    # ถอยหลัง 2 ชั้น (จาก done -> src -> curriculum_tu) เพื่อหา service_account.json
+    # หรือถ้าหาไม่เจอ ให้ลองหาในโฟลเดอร์ปัจจุบันดู
+    potential_paths = [
+        script_dir.parent.parent / "service_account.json", # หาที่ root
+        Path("service_account.json")                       # หาที่ปัจจุบัน
+    ]
+    
+    sa_path = None
+    for p in potential_paths:
+        if p.exists():
+            sa_path = p
+            break
+        
     if not sa_path.exists():
         raise RuntimeError(f"Missing service_account.json in current dir: {Path.cwd()}")
 
