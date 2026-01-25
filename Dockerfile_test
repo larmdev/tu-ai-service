@@ -6,5 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./src ./src
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main_local_save:app", "--host", "0.0.0.0", "--port", "8000"]
