@@ -35,53 +35,59 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
 
 curriculumId
 
-studentCharacteristicDevelopment
-  generalCharacteristics
-    description
-    relatedPlos
-  professionalCharacteristics
-    description
-    relatedPlos
+จากหัวข้อ การพัฒนาคุณลักษณะของนักศึกษาในหลักสูตร
+studentCharacteristicDevelopment (เป็นตารางที่มี 2 column 'คุณลักษณะของนักศึกษา' และ 'ผลลัพธ์การเรียนรู้ของหลักสูตร (PLOs)' โดยใน 'คุณลักษณะของนักศึกษา' จะคำว่า คุณลักษณะบุคคลทั่วไป และ คุณลักษณะบุคคลตามวิชาชีพหรือศาสตร์ อยู่ในนั้น และบางที 'คุณลักษณะของนักศึกษา' ก็จะมีทุกข้อรวมในช่องเดียว บางทีก็จะเป็นข้อละแถว)
+  generalCharacteristics ('คุณลักษณะของนักศึกษา' ที่อยู่ใน คุณลักษณะบุคคลทั่วไป)
+    description คุณลักษณะของนักศึกษา (รวมมาทั้งหมด)
+    relatedPlos ผลลัพธ์การเรียนรู้ของหลักสูตร (PLOs) (รวมมาทั้งหมด)
+  professionalCharacteristics ('คุณลักษณะของนักศึกษา' ที่อยู่ใน คุณลักษณะบุคคลตามวิชาชีพหรือศาสตร์)
+    description คุณลักษณะของนักศึกษา (รวมมาทั้งหมด)
+    relatedPlos ผลลัพธ์การเรียนรู้ของหลักสูตร (PLOs) (รวมมาทั้งหมด)
 
-ploStandardAlignment
-  ploCode
-  isGeneric
-  isSpecific
-  bloomDomain
-  bloomLevel
-  hasKnowledge
-  hasSkill
-  hasEthics
-  hasCharacter
+จากหัวข้อ ตารางแสดงความสัมพันธ์ระหว่างผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs) กับมาตรฐานคุณวุฒิระดับอุดมศึกษา พ.ศ. 2565
+ploStandardAlignment (เป็นตารางที่มี 4 column 'ผลลัพธ์การเรียนรู้ของหลักสูตร (PLOs)' ,'ประเภท' ,'Blooms Taxonomy' และ 'รายละเอียดผลลัพธ์การเรียนรู้ตามมาตรฐานคุณวุฒิระดับอุดมศึกษา พ.ศ. 2565' โดย 'ประเภท' มี 2 column ย่อย 'ทั่วไป(Generic)' และ 'เฉพาะ (Specific)' , 'Bloom’s Taxonomy' มี 2 column ย่อย  'Domain' และ 'Level' สุดท้าย 'รายละเอียดผลลัพธ์การเรียนรู้ตามมาตรฐานคุณวุฒิระดับอุดมศึกษา พ.ศ. 2565' มีหลาย column ย่อย ส่วนมากจะเป็น 'ความรู้ (Knowledge)' ,'ทักษะ (Skill)' ,'จริยธรรม (Ethic)' และ 'ลักษณะบุคคล (Character)' บางทีอาจมีตัวอื่นเช่น 'จริยธรรมลักษณะบุคคล (Attitude)')
+  ploCode 'ผลลัพธ์การเรียนรู้ของหลักสูตร(PLOs)'
+  isGeneric 'ทั่วไป(Generic)' (หากมีค่าให้เป็น true หากไม่มี flase)
+  isSpecific 'เฉพาะ (Specific)' (หากมีค่าให้เป็น true หากไม่มี flase)
+  bloomDomain 'Domain'
+  bloomLevel 'Level'
+  hasKnowledge 'ความรู้ (Knowledge)' (หากมีค่าให้เป็น true หากไม่มี flase)
+  hasSkill 'ทักษะ (Skill)' (หากมีค่าให้เป็น true หากไม่มี flase)
+  hasEthics 'จริยธรรม (Ethic)' (หากมีค่าให้เป็น true หากไม่มี flase)
+  hasCharacter 'ลักษณะบุคคล (Character)' (หากมีค่าให้เป็น true หากไม่มี flase)
 
-ploTeachingAssessment
-  ploCode
-  teachingStrategy
-  assessmentMethod
+จากหัวข้อ ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs) กลยุทธ์/วิธีการสอน และ กลยุทธ์/วิธีการวัดและการประเมินผล
+ploTeachingAssessment (เป็นตารางที่มี 3 column 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร' ,'กลยุทธ์/วิธีการสอน' และ 'วิธีการวัดและประเมินผล')
+  ploCode 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร'
+  teachingStrategy 'กลยุทธ์/วิธีการสอน'
+  assessmentMethod 'วิธีการวัดและประเมินผล'
 
-curriculumMapping
-  courseGroup
+จากหัวข้อ แผนที่แสดงการกระจายความรับผิดชอบผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs) สู่รายวิชา (Curriculum Mapping)
+curriculumMapping (ตารางที่มี 4 column หลัก 'รายวิชา / ชุดวิชา และ หน่วยกิต' ,
+'หน่วยกิต' ,'ชั้นปีที่' และ'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' ซึ่ง 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' จะมี column ย่อย เป็นรหัส เช่น 'PLO1' 'PLO-4' 'S3' แต่บางครั้ง จะมีแค่ column ย่อย 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' จะไม่มี)
+  courseGroup ค่าจาก 'รายวิชา / ชุดวิชา และ หน่วยกิต' (แต่จะมีความพิเศษตรงที่ ข้อความนั้น ไม่ใช่หัสรายวิชา ส่วนมาก จะเป็นที่ขึ้ต้นด้วยคำว่า 'หมวด', 'วิชา' หรือ 'กลุ่มวิชา' โดยแถวนั้นจะไม่มีค่าอะไรเลยนอกจากใน 'รายวิชา / ชุดวิชา และ หน่วยกิต')
   courses
-    subCourseGroup
-    credits
-    yearLevel
-    plos
+    subCourseGroup 'รายวิชา / ชุดวิชา และ หน่วยกิต' (เป็นค่าที่รหัสรายวิชา และชื่อรายวิชา)
+    credits 'หน่วยกิต' (หากมีค่ารายละเอียดของหน่วยกิต เช่น 3 [3-0-9] ใน [] คือรายละเอียดหน่วยกิต ไม่เอารายละเอียดหน่วยกิต)
+    yearLevel 'ชั้นปีที่' (หากมีรายละเอียดของชั้นปี เช่น 3/2 เราจะไม่เอา รายละเอียด คือจะเอาแค่เลขด้านหน้า)
+    plos มี additionalProperties key คือ columns ย่อยของ 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' ทั้งหมด (ซึ่งหาก ช่องไหนมีค่าให้ ส่ง true อันไหนไม่มีค่าให้ false)
 
-yearEndLearningOutcomeExpectations
-  yearLevel
+จากหัวข้อ ความคาดหวังของผลลัพธBการเรียนรู้เมื่อสิ้นปgการศึกษา
+yearEndLearningOutcomeExpectations (ตารางที่มี 3 column หลัก 'ชั้นปี' ,'ความคาดหวังของผลลัพธ์การเรียนรู้เมื่อสิ้นปีการศึกษา' และ'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' ซึ่ง 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' จะมี column ย่อย เป็นรหัส เช่น 'PLO1' ,'PLO-4' ,'S3' แต่บางครั้ง จะมีแค่ column ย่อย 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' จะไม่มี โดย 'ชั้นปี' จะมีหลาย 'ความคาดหวังของผลลัพธ์การเรียนรู้เมื่อสิ้นปีการศึกษา')
+  yearLevel 'ชั้นปี' (หากไม่มีรายละเอียดเพิ่มเติมเอามาแค่เลข แต่หากมีคำว่า '(สหกิจศึกษา)' ให้เติม 0 ด้านหลัง และ หากมีคำว่า '(โครงงานพิเศษ)' ให้เติม 1 ด้านหลัง)
   expectations
-    expectation
-    plos
+    expectation 'ความคาดหวังของผลลัพธ์การเรียนรู้เมื่อสิ้นปีการศึกษา'
+    plos มี additionalProperties key คือ columns ย่อยของ 'ผลลัพธ์การเรียนรู้ระดับหลักสูตร (PLOs)' ทั้งหมด (ซึ่งหาก ช่องไหนมีค่าให้ ส่ง true อันไหนไม่มีค่าให้ false)
 
-fieldExperience
-  period
-  preparation
-  assessment
+fieldExperience จากหัวข้อ องค์ประกอบเกี่ยวกับประสบการณ์ภาคสนาม (การฝึกงาน หรือสหกิจศึกษา)
+  period ช่วงเวลา
+  preparation การเตรียมการ
+  assessment การประเมินผล
 
-projectResearchRequirement
-  period
-  preparation
-  assessment
+projectResearchRequirement จากหัวข้อ ข้อกำหนดเกี่ยวกับการทำโครงงาน หรือ งานวิจัย
+  period ช่วงเวลา
+  preparation การเตรียมการ
+  assessment การประเมินผล
     """
 
     schema = {
