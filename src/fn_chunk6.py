@@ -50,61 +50,64 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         """
 
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-ข้อมูลจากหมวดที่ 
+ข้อมูลจากหมวดที่ 6
 
 curriculumId
 
-curriculumNameG6
+curriculumNameG6 หลักสูตรและ สาขา เช่น (หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาศาสตร์และนวัตกรรมข้อมูล)
 
-physicalReadiness
-classroom
-laboratory
-learningFacilities
-otherPhysicalReadiness
+physicalReadiness จากหัวข้อ ด้านกายภาพ
+    classroom ห้องเรียน
+    laboratory ห้องปฏิบัติการ
+    learningFacilities สิ่งอํานวยความสะดวกเพื่อการเรียนรู้ (หากมีอธิบายย่อของต่างๆอีกทีเช่น เอกสาร มีจำนวนรวมทั้งหมด 12,809 เล่ม แบ่งเป็น ภาษาไทย ภาษาต่างประเทศ ให้เอามาแค่ ตัวเลขแบบรวม)
+    otherPhysicalReadiness ความพร้อมด้านกายภาพอื่น ๆ
 
-academicWorksSummaries
-researchCount
-academicWorkCount
-totalAcademicWorks
-fullTimeLecturerCount
-researchRatio
-otherWorkRatio
-overallRatio
+จากหัวข้อ ด้านวิชาการ
+academicWorksSummaries จํานวนผลงานวิชาการ สิ่งประดิษฐ์ ผลงานอื่น ๆ ของอาจารย์ประจําหลักสูตร ในรอบ 5 ปีย้อนหลัง (เป็นตาราง ซึ่งมี 3 column หลัก 'จํานวนผลงานทางวิชาการ', 'จํานวนอาจารย์ประจําหลักสูตร (คน)' และ 'สัดส่วนอาจารย์ : ผลงาน' โดย 'จํานวนผลงานทางวิชาการ' มี 3 column ย่อย 'งานวิจัยหรือบทความวิจัย(ชิ้น)', 'ผลงานทางวิชาการอื่น ๆ เช่น ตํารา หนังสือ/บทความวิชาการอื่น ๆสิ่งประดิษฐ์ เป็นต้น(ชิ้น)' และ 'รวมผลงานทางวิชาการทั้งหมด (ชิ้น)' ใน 'สัดส่วนอาจารย์ : ผลงาน' มี 2 columns ย่อยคือ 'วิจัย' และ 'อื่น ๆ')
+    researchCount จาก 'งานวิจัยหรือบทความวิจัย (ชิ้น)'
+    academicWorkCount จาก 'ผลงานทางวิชาการอื่น ๆ เช่น ตํารา หนังสือ/บทความวิชาการอื่น ๆ สิ่งประดิษฐ์ เป็นต้น (ชิ้น)'
+    totalAcademicWorks จาก 'รวมผลงานทางวิชาการทั้งหมด (ชิ้น)'
+    fullTimeLecturerCount จาก 'จํานวนอาจารย์ประจําหลักสูตร (คน)'
+    researchRatio จาก 'วิจัย' (เอามาแค่อัตรา)
+    otherWorkRatio จาก 'อื่น ๆ' (เอามาแค่อัตรา)
+    overallRatio รวม (เป็นช่องที่อยู่ด้านล่างของ 'วิจัย' 'อื่น ๆ' เอามาแค่อัตรา)
+thesisAdvisors ความพร้อมของอาจารย์ที่ปรึกษาวิทยานิพนท์/ค้นคว้าอิสระ (เป็นตารางที่มี 3 column หลัก 'ลำดับ', 'อาจารย์ที่ปรึกษาหลักสูตร' และ 'จำนวนนักศึกษาที่รับเป็นที่ปรึกษาวิทยานิพนท์/ค้นคว้าอิสระ (คน)' โดย 'จำนวนนักศึกษาที่รับเป็นที่ปรึกษาวิทยานิพนท์/ค้นคว้าอิสระ (คน)' แบ่งเป็น 3 column ย่อย 'จำนวนที่รับได้ทั้งหมด', 'จำนวนรับในปัจจุบัน' และ 'จำนวนที่รับเพิ่มเติมได้')
+    advisorName 'อาจารย์ที่ปรึกษาหลักสูตร'
+    maxStudents 'จำนวนที่รับได้ทั้งหมด'
+    currentStudents 'จำนวนรับในปัจจุบัน'
+    availableSlots 'จำนวนที่รับเพิ่มเติมได้'
 
-thesisAdvisors
-advisorName
-maxStudents
-currentStudents
-availableSlots
+graduateProductionCost ค่าใช้จ่ายในการผลิตบัณฑิต ( เป็นตาราง ซึ่งมีcolumn 'ลำดับ' 'รายจ่าย' และ 'บาท/หลักสูตร' บางครั้งไม่มี 'ลำดับ' และ 'บาท/หลักสูตร' จะเป็นเลขปีแทน หากมีหลายปีให้เอาเลขปีที่น้อยที่สุด และเลขปีนั้นแทน 'บาท/หลักสูตร')
+name 'รายจ่าย'
+amount 'บาท/หลักสูตร'
 
-graduateProductionCost
-name
-amount
+educationIncome รายได้จากค่าธรรมเนียมการศึกษา/และอื่น ๆ ( เป็นตาราง ซึ่งมีcolumn 'ลำดับ' 'รายได้' และ 'บาท/หลักสูตร' บางครั้งไม่มี 'ลำดับ' และ 'บาท/หลักสูตร' จะเป็นเลขปีแทน หากมีหลายปีให้เอาเลขปีที่น้อยที่สุด และเลขปีนั้นแทน 'บาท/หลักสูตร')
+name 'รายได้'
+amount 'บาท/หลักสูตร'
 
-educationIncome
-name
-amount
+breakEvenAnalysis จากหัวข้อ วิเคราะห์ความคุ้มทุนของหลักสูตร (หากมีหลายปี ให้เอาเลขปีที่น้อยที่สุด)
+revenuePerStudent รายรับต่อคนตลอดหลักสูตร
+costPerStudent ค่าใช้จ่ายต่อคนตลอดหลักสูตร
+breakEvenStudentCount จำนวนนักศึกษาน้อยสุดที่คุ้มทุน
 
-breakEvenAnalysis
-revenuePerStudent
-costPerStudent
-breakEvenStudentCount
+managementReadiness จากหัวข้อ ด้านการบริหารจัดการ
+    lecturerCount จํานวนอาจารย์ (หากมีอาจารย์ทั้ง ประจำ พิเศษ หรือ อื่นๆ ให้รวมกันเป็นค่าเดียว)
+    staffCount จํานวนเจ้าหน้าที่
+    จากหัวข้อย่อย การพัฒนาความรู้และทักษะให้แก่อาจารย์
+    teachingSkillDevelopment การพัฒนาทักษะการจัดการเรียนการสอนและการประเมินผล
+    professionalSkillDevelopment การพัฒนาทักษะด้านวิชาการและวิชาชีพ
 
-managementReadiness
-lecturerCount
-staffCount
-teachingSkillDevelopment
-professionalSkillDevelopment
-
-courseLecturers
-  fullName
-  position
-  courseRole
-  qualifications
-    degree
-    major
-    institute
-    graduationYearBe
+จากหัวข้อ อาจารย์ผู้รับผิดชอบหลักสูตรและอาจารย์ประจําหลักสูตร
+courseLecturers (เป็นตารางที่มี 6 column ลำดับที่
+'ตำแหน่งทางวิชาการ' ,'ชื่อ - สกุล' ,'คุณวุฒิ' ,'สาขาวิชา' ,'สำเร็จการศึกษา' บางทีอาจมี column อื่นบ้างเช่น 'ใบอนุญาตเป็น' อันนั้นไม่ต้องสนใจ โดย 'สำเร็จการศึกษา' มี 2 column ย่อย 'สถาบัน' และ 'ปี พ.ศ.' ปล. ในบางครั้งท้ายตาราง จะมีการบอกว่าอาจารย์ตั้งแต่ ลำดับที่ 1 ถึง เลขใดๆ เป็นอาจารย์ผู้รับผิดชอบหลักสูตร หากไม่มีการบอกให้คิดว่าอาจารย์ทุกคนเป็นผู้รับผิดชอบหลักสูตร)
+  position 'ตำแหน่งทางวิชาการ'
+  fullName 'ชื่อ - สกุล'
+  courseRole ตอบ 1 หากเป็นอาจารย์ผู้รับผิดชอบหลักสูตร หรือ ตอบ 2 หากไม่ได้เป็นอาจารย์ผู้รับผิดชอบหลักสูตร
+  qualifications (รายละเอียดการศึกษาของอาจารย์ บางทีละเอียดของแต่ละ column จะรวมเป็นอันเดียวของแต่ละ column เช่น อาจารย์ มี 3 คุณวุติ บางตาราง ทั้ง 3 คุณวุฒิจะอยู่ช่องเดียวกัน บางอันแต่ละ คุณวุฒิจะอยู่คนละช่องกัน จะมี column อื่นมาคั่น คุณวุติ)
+    degree 'คุณวุฒิ'
+    major 'สาขาวิชา'
+    institute 'สถาบัน'
+    graduationYearBe 'ปี พ.ศ.'
     """
 
     schema = {
@@ -202,8 +205,8 @@ courseLecturers
                 "items": {
                     "type": "object",
                     "properties": {
-                        "fullName": {"type": ["string", "null"]},
                         "position": {"type": ["string", "null"]},
+                        "fullName": {"type": ["string", "null"]},
                         "courseRole": {"type": ["string", "null"]},
                         "qualifications": {
                             "type": ["array", "null"],
