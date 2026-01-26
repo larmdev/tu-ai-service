@@ -36,7 +36,7 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
 
         # กำหนด schema & prompt
         if chunk_idx == 4 :
-            continue
+            return "ppp"
 
         schema, prompt = None, None
         if chunk_idx == 0:
@@ -94,23 +94,23 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             temperature=0.00,
         )
 
-        elif chunk_idx == 3:
-            from fn_chunk4_2 import schema_prompt
-            schema, prompt = schema_prompt()
-            chunk_pdf_bytes = slice_pdf_pages(
-                pdf_bytes=pdf_bytes,
-                start_page=start_chunk_page[4],
-                end_page=start_chunk_page[5]
-            )
-            data2 = call_openrouter_pdf(
-                api_key=OPEN_ROUTER_KEY,
-                model=MODEL,
-                prompt=prompt,
-                schema=schema,
-                pdf_bytes=chunk_pdf_bytes,
-                engine="pdf-text",
-                temperature=0.00,
-            )
+        # if chunk_idx == 3:
+        #     from fn_chunk4_2 import schema_prompt
+        #     schema, prompt = schema_prompt()
+        #     chunk_pdf_bytes = slice_pdf_pages(
+        #         pdf_bytes=pdf_bytes,
+        #         start_page=start_chunk_page[4],
+        #         end_page=start_chunk_page[5]
+        #     )
+        #     data2 = call_openrouter_pdf(
+        #         api_key=OPEN_ROUTER_KEY,
+        #         model=MODEL,
+        #         prompt=prompt,
+        #         schema=schema,
+        #         pdf_bytes=chunk_pdf_bytes,
+        #         engine="pdf-text",
+        #         temperature=0.00,
+        #     )
 
 
         ####### regex 1-9
@@ -128,7 +128,7 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             "chunk": f"chunk{section}",
             "data": data
         }
-        
+
         CALLBACK_URL = CALLBACK_URL + section
         # ยิง Callback
         async with httpx.AsyncClient() as client:
@@ -158,7 +158,7 @@ async def background_manager(body: ChunkRequest, pdf_bytes: bytes):
             end_page=end_page,
             pdf_bytes=pdf_bytes,
             refId=body.refId,
-            fileName=body.fileName
+            fileName=body.fileName,
             start_chunk_page=start_chunk_page
         )
         tasks.append(task)
