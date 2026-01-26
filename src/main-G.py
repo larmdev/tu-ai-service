@@ -52,7 +52,7 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 3:
-            from fn_chunk4 import schema_prompt
+            from fn_chunk4_2 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 5:
