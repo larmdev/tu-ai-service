@@ -16,6 +16,7 @@ import sys
 from fn_gemini import call_openrouter_pdf
 from fn_slice_page_pdf import slice_pdf_pages
 from fn_chunk_number import locate_chunks
+from fn_reorder_data_by_schema import reorder_data_by_schema
 
 load_dotenv()
 
@@ -163,6 +164,10 @@ async def process_and_save_chunk(chunk_idx, start_page, end_page, pdf_bytes, fil
             api_key=OPEN_ROUTER_KEY, model=MODEL, prompt=prompt, schema=schema,
             pdf_bytes=chunk_pdf_bytes, engine="pdf-text", temperature=0.00,
         )
+    
+        if data:
+        # เรียกใช้ฟังก์ชันจัดเรียง (data จะถูกเรียง key ใหม่ตาม schema เป๊ะๆ)
+            data = reorder_data_by_schema(data, schema)
 
         # Save File
         save_dir = os.path.join(TARGET_BASE_DIR, fileName)

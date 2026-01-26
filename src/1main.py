@@ -1,4 +1,4 @@
-load_dotenv()
+
 
 from fn_gemini import call_openrouter_pdf
 from fn_slice_page_pdf import slice_pdf_pages
@@ -6,8 +6,7 @@ from fn_pdf_to_byte import to_pdf_bytes
 from fn_chunk_number import locate_chunks
 import os
 import json
-OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
-MODEL = os.getenv("MODEL")
+
 
 
 #####
@@ -21,12 +20,25 @@ from typing import Any, Dict
 from pathlib import Path
 from done.read_text import extract_page_text_as_debug_string
 list_pdf = ["""
-https://drive.google.com/file/d/1Z_0zWJQQCrjyEvivrt1lr4ys6FmfkMmO/edit
+https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit
                                                                                                                   
             """
 ]
+
+load_dotenv()
+OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
+print(OPEN_ROUTER_KEY)
+MODEL = os.getenv("MODEL")
+
 drive_url = os.getenv("DRIVE_URL")
-sa_path = "service_account.json"
+script_dir = Path(__file__).resolve().parent
+
+# 2. ถอยหลัง 1 ชั้นเพื่อไปหาโฟลเดอร์หลัก (จะได้ .../curriculum_tu)
+# หมายเหตุ: .parent 1 ครั้ง เพราะไฟล์อยู่ใน src (1 ชั้นจาก root)
+project_root = script_dir.parent 
+
+# 3. รวม path เข้ากับชื่อไฟล์
+sa_path = project_root / "service_account.json"
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 creds = service_account.Credentials.from_service_account_file(str(sa_path), scopes=SCOPES)
 drive = build("drive", "v3", credentials=creds, cache_discovery=False)
@@ -101,7 +113,7 @@ for i in list_pdf:
 
     start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
     
-    start_chunk_page = [x if i == 5 or i == 6 else None for i, x in enumerate(start_chunk_page)]
+    start_chunk_page = [x if i == 6 or i == 7 else None for i, x in enumerate(start_chunk_page)]
 
 
     for i, x in enumerate(start_chunk_page):
@@ -140,7 +152,7 @@ for i in list_pdf:
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
         elif i == 3 and start_page is not None and end_page is not None:
-            from fn_chunk4 import schema_prompt
+            from fn_chunk4_1 import schema_prompt
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
         elif i == 4 and start_page is not None and end_page is not None:

@@ -20,6 +20,7 @@ services:
       # อันนี้สำคัญมาก:
       # เช็คว่า Path ซ้ายมือ (เครื่องคุณ) ชี้ไปที่ Folder ที่อยากให้ไฟล์โผล่ออกมาจริงๆ
       - ~/Desktop/pimdej/curriculum_tu/data:/app/data
+      - ./src:/app/src
     environment:
       - OPEN_ROUTER_KEY=${OPEN_ROUTER_KEY}
       - MODEL=${MODEL}

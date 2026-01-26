@@ -40,7 +40,7 @@ curriculumId
 
 educationalPhilosophy ปรัชญาการศึกษา
 
-curriculumObjectives วัตถุประสงค์ของหลักสูตร
+curriculumObjectives จากหัวข้อ วัตถุประสงค์ของหลักสูตร (หากมีหลายข้อให้คั่นด้วย ",")
 
 จากหัวข้อ ผลลัพธ์การเรียนรู้ระดับหลักสูตร (Program–level Learning Outcomes: PLOs)
 programLearningOutcomes 

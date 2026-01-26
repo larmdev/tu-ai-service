@@ -1,6 +1,5 @@
 def schema_prompt(chunk_pdf_bytes: bytes = None):
 
-
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
 ข้อมูลจาก อธิบายรายวิชา
 
@@ -30,10 +29,9 @@ courses
                         "courseNameTh": {"type": ["string", "null"]},
                         "courseNameEn": {"type": ["string", "null"]},
                         "credits": {"type": ["integer", "null"]},
+                        "courseDescriptionTh": {"type": ["string", "null"]},
+                        "courseDescriptionEn": {"type": ["string", "null"]},
                         "lecturePracticeSelfStudy": {"type": ["string", "null"]},
-                        "courseGroup": {"type": ["string", "null"]},
-                        "semester": {"type": ["integer", "null"]},
-                        "academicYear": {"type": ["integer", "null"]},
                     },
                     "required": ["sequence"],
                 },
