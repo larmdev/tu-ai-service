@@ -164,10 +164,12 @@ async def process_and_save_chunk(chunk_idx, start_page, end_page, pdf_bytes, fil
             api_key=OPEN_ROUTER_KEY, model=MODEL, prompt=prompt, schema=schema,
             pdf_bytes=chunk_pdf_bytes, engine="pdf-text", temperature=0.00,
         )
-    
+        
         if data:
         # เรียกใช้ฟังก์ชันจัดเรียง (data จะถูกเรียง key ใหม่ตาม schema เป๊ะๆ)
+            logger.info(data)
             data = reorder_data_by_schema(data, schema)
+            logger.info(f"-------- reorder --------\n{data}")
 
         # Save File
         save_dir = os.path.join(TARGET_BASE_DIR, fileName)
@@ -180,6 +182,8 @@ async def process_and_save_chunk(chunk_idx, start_page, end_page, pdf_bytes, fil
             "section": section_str,
             "data": data
         }
+
+        
 
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(output_content, f, ensure_ascii=False, indent=4)
