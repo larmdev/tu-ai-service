@@ -110,5 +110,123 @@ amount 'บาท/หลักสูตร'
         },
     }
 
+    master_schema = {
+        "type": "object",
+        "properties": {
+            "curriculumId": {"type": ["string", "null"]},
+            "curriculumNameG6": {"type": ["string", "null"]},
 
-    return schema, prompt
+            "physicalReadiness": {
+                "type": ["object", "null"],
+                "properties": {
+                    "classroom": {"type": ["string", "null"]},
+                    "laboratory": {"type": ["string", "null"]},
+                    "learningFacilities": {"type": ["string", "null"]},
+                    "otherPhysicalReadiness": {"type": ["string", "null"]}
+                },
+                "additionalProperties": False
+            },
+
+            "academicWorksSummaries": {
+                "type": ["object", "null"],
+                "properties": {
+                    "researchCount": {"type": ["integer", "null"]},
+                    "academicWorkCount": {"type": ["integer", "null"]},
+                    "totalAcademicWorks": {"type": ["integer", "null"]},
+                    "fullTimeLecturerCount": {"type": ["integer", "null"]},
+                    "researchRatio": {"type": ["string", "null"]},
+                    "otherWorkRatio": {"type": ["string", "null"]},
+                    "overallRatio": {"type": ["string", "null"]}
+                },
+                "additionalProperties": False
+            },
+
+            "thesisAdvisors": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "advisorName": {"type": ["string", "null"]},
+                        "maxStudents": {"type": ["integer", "null"]},
+                        "currentStudents": {"type": ["integer", "null"]},
+                        "availableSlots": {"type": ["integer", "null"]}
+                    },
+                    "additionalProperties": False
+                }
+            },
+
+            "graduateProductionCost": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": ["string", "null"]},
+                        "amount": {"type": ["number", "null"]}
+                    },
+                    "additionalProperties": False
+                }
+            },
+
+            "educationIncome": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": ["string", "null"]},
+                        "amount": {"type": ["number", "null"]}
+                    },
+                    "additionalProperties": False
+                }
+            },
+
+            "breakEvenAnalysis": {
+                "type": ["object", "null"],
+                "properties": {
+                    "revenuePerStudent": {"type": ["number", "null"]},
+                    "costPerStudent": {"type": ["number", "null"]},
+                    "breakEvenStudentCount": {"type": ["integer", "null"]}
+                },
+                "additionalProperties": False
+            },
+
+            "managementReadiness": {
+                "type": ["object", "null"],
+                "properties": {
+                    "lecturerCount": {"type": ["integer", "null"]},
+                    "staffCount": {"type": ["integer", "null"]},
+                    "teachingSkillDevelopment": {"type": ["string", "null"]},
+                    "professionalSkillDevelopment": {"type": ["string", "null"]}
+                },
+                "additionalProperties": False
+            },
+
+            "courseLecturers": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "fullName": {"type": ["string", "null"]},
+                        "position": {"type": ["string", "null"]},
+                        "courseRole": {"type": ["string", "null"]},
+                        "qualifications": {
+                            "type": ["array", "null"],
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "degree": {"type": ["string", "null"]},
+                                    "major": {"type": ["string", "null"]},
+                                    "institute": {"type": ["string", "null"]},
+                                    "graduationYearBe": {"type": ["integer", "null"]}
+                                },
+                                "additionalProperties": False
+                            }
+                        }
+                    },
+                    "additionalProperties": False
+                }
+            }
+        },
+        "additionalProperties": False
+    }
+
+    return schema, prompt, master_schema

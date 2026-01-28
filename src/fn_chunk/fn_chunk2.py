@@ -130,4 +130,85 @@ studentLimitationStrategies หากมีหลายข้อ ให้ ค�
     }
 
 
-    return schema, prompt
+    master_schema = {
+        "type": "object",
+        "properties": {
+            "curriculumId": {
+                "type": ["string", "null"],
+                "description": "UUID ของหลักสูตร (ถ้าไม่พบให้เป็น null)"
+            },
+
+            "admissionType2": {
+                "type": ["string", "null"],
+                "enum": [
+                    "thai",
+                    "international",
+                    "thai-and-international"
+                ]
+            },
+
+            "admissionQualifications": {
+                "type": ["string", "null"]
+            },
+
+            "admissionSelectionProcess": {
+                "type": ["string", "null"]
+            },
+
+            "studentsPerYear": {
+                "type": ["integer", "null"]
+            },
+
+            "studentAdmissionPlans": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "planName": {
+                            "type": ["string", "null"]
+                        },
+                        "amount": {
+                            "type": ["integer", "null"]
+                        },
+                        "rows": {
+                            "type": ["array", "null"],
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "sequence": {
+                                        "type": "integer"
+                                    },
+                                    "rowType": {
+                                        "type": ["string", "null"]
+                                    },
+                                    "years": {
+                                        "type": ["object", "null"],
+                                        "additionalProperties": {
+                                            "type": ["integer", "null"]
+                                        }
+                                    }
+                                },
+                                "required": ["sequence", "rowType", "years"],
+                                "additionalProperties": False
+                            }
+                        }
+                    },
+                    "required": ["planName", "rows"],
+                    "additionalProperties": False
+                }
+            },
+
+            "firstYearStudentProblems": {
+                "type": ["string", "null"]
+            },
+
+            "studentLimitationStrategies": {
+                "type": ["string", "null"]
+            }
+        },
+        "required": [],
+        "additionalProperties": False
+    }
+
+
+    return schema, prompt, master_schema

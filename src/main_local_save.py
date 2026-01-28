@@ -18,7 +18,6 @@ from function.fn_slice_page_pdf import slice_pdf_pages
 from function.fn_chunk_number import locate_chunks
 from function.fn_reorder_data_by_schema import reorder_data_by_schema
 
-load_dotenv()
 
 # --- 1. ตั้งค่า Logger ---
 # สร้างโฟลเดอร์ logs ถ้ายังไม่มี

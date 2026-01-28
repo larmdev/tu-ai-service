@@ -130,4 +130,140 @@ ploTeachingAssessment (เป็นตารางที่มี 3 column 'ผ�
         "required":["studentCharacteristicDevelopment","ploStandardAlignment","ploTeachingAssessment"]
     }
 
-    return schema, prompt
+    master_schema = {
+        "type": "object",
+        "properties": {
+            "curriculumId": {"type": ["string", "null"]},
+
+            "studentCharacteristicDevelopment": {
+                "type": ["object", "null"],
+                "properties": {
+                    "generalCharacteristics": {
+                        "type": ["object", "null"],
+                        "properties": {
+                            "description": {"type": ["string", "null"]},
+                            "relatedPlos": {"type": ["string", "null"]}
+                        },
+                        "additionalProperties": False
+                    },
+                    "professionalCharacteristics": {
+                        "type": ["object", "null"],
+                        "properties": {
+                            "description": {"type": ["string", "null"]},
+                            "relatedPlos": {"type": ["string", "null"]}
+                        },
+                        "additionalProperties": False
+                    }
+                },
+                "additionalProperties": False
+            },
+
+            "ploStandardAlignment": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "ploCode": {"type": ["string", "null"]},
+                        "isGeneric": {"type": ["boolean", "null"]},
+                        "isSpecific": {"type": ["boolean", "null"]},
+                        "bloomDomain": {"type": ["string", "null"]},
+                        "bloomLevel": {"type": ["string", "null"]},
+                        "hasKnowledge": {"type": ["boolean", "null"]},
+                        "hasSkill": {"type": ["boolean", "null"]},
+                        "hasEthics": {"type": ["boolean", "null"]},
+                        "hasCharacter": {"type": ["boolean", "null"]}
+                    },
+                    "additionalProperties": False
+                }
+            },
+
+            "ploTeachingAssessment": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "ploCode": {"type": ["string", "null"]},
+                        "teachingStrategy": {"type": ["string", "null"]},
+                        "assessmentMethod": {"type": ["string", "null"]}
+                    },
+                    "additionalProperties": False
+                }
+            },
+
+            "curriculumMapping": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "courseGroup": {"type": ["string", "null"]},
+                        "courses": {
+                            "type": ["array", "null"],
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "subCourseGroup": {"type": ["string", "null"]},
+                                    "credits": {"type": ["integer", "null"]},
+                                    "yearLevel": {"type": ["integer", "null"]},
+                                    "plos": {
+                                        "type": ["object", "null"],
+                                        "additionalProperties": {"type": ["boolean", "null"]}
+                                    }
+                                },
+                                "additionalProperties": False
+                            }
+                        }
+                    },
+                    "additionalProperties": False
+                }
+            },
+
+            "yearEndLearningOutcomeExpectations": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "yearLevel": {"type": ["integer", "null"]},
+                        "expectations": {
+                            "type": ["array", "null"],
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "expectation": {"type": ["string", "null"]},
+                                    "plos": {
+                                        "type": ["object", "null"],
+                                        "additionalProperties": {"type": ["boolean", "null"]}
+                                    }
+                                },
+                                "additionalProperties": False
+                            }
+                        }
+                    },
+                    "additionalProperties": False
+                }
+            },
+
+            "fieldExperience": {
+                "type": ["object", "null"],
+                "properties": {
+                    "period": {"type": ["string", "null"]},
+                    "preparation": {"type": ["string", "null"]},
+                    "assessment": {"type": ["string", "null"]}
+                },
+                "additionalProperties": False
+            },
+
+            "projectResearchRequirement": {
+                "type": ["object", "null"],
+                "properties": {
+                    "period": {"type": ["string", "null"]},
+                    "preparation": {"type": ["string", "null"]},
+                    "assessment": {"type": ["string", "null"]}
+                },
+                "additionalProperties": False
+            }
+        },
+        "additionalProperties": False
+    }
+
+
+    return schema, prompt, master_schema
