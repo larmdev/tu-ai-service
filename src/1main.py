@@ -59,11 +59,11 @@ from pathlib import Path
 from done.read_text import extract_page_text_as_debug_string
 list_pdf = [
     "https://drive.google.com/file/d/1Z1yqquXlgKTRaK7AEBGMV2fbxUqti3kO/edit",
-    "https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit",
-    "https://drive.google.com/file/d/1I9qBUchBydejWwGgbkpC-IdZFvfg61G-/edit",
-    "https://drive.google.com/file/d/1BuRHEYFGX0uQRJaiAG_Wo8TLnuZfxIZa/edit",
-    "https://drive.google.com/file/d/1Z_0zWJQQCrjyEvivrt1lr4ys6FmfkMmO/edit",
-    "https://drive.google.com/file/d/1gZf4ob2MscXVIodVEDe_Y5RhWfy02On9/view"   
+    # "https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit",
+    # "https://drive.google.com/file/d/1I9qBUchBydejWwGgbkpC-IdZFvfg61G-/edit",
+    # "https://drive.google.com/file/d/1BuRHEYFGX0uQRJaiAG_Wo8TLnuZfxIZa/edit",
+    # "https://drive.google.com/file/d/1Z_0zWJQQCrjyEvivrt1lr4ys6FmfkMmO/edit",
+    # "https://drive.google.com/file/d/1gZf4ob2MscXVIodVEDe_Y5RhWfy02On9/view"   
 ]
 close_log = setup_logging_to_file("1log_test.log", mode="w")  # "a" ต่อท้าย, "w" ทับไฟล์เดิม
 
@@ -157,7 +157,7 @@ try:
 
         start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
         
-        start_chunk_page = [x if i == 6 or i == 5 else None for i, x in enumerate(start_chunk_page)]
+        start_chunk_page = [x if i == 3 or i == 4 else None for i, x in enumerate(start_chunk_page)]
 
 
         for i, x in enumerate(start_chunk_page):
