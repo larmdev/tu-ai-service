@@ -183,3 +183,18 @@ async def extract_curr(body: ChunkRequest, background_tasks: BackgroundTasks):
         "message": "Success. Processing started in background."
     }
 
+@app.get("/api/env")
+async def env():
+    return {
+        "OPEN_ROUTER_KEY": OPEN_ROUTER_KEY,
+        "MODEL": MODEL,
+        "CALLBACK_URL": CALLBACK_URL
+    }
+
+@app.get("/api/msg")
+async def msg():
+    return {
+        "status": 200,
+        "message": "API is running."
+    }
+
