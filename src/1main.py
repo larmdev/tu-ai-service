@@ -4,6 +4,7 @@ from fn_gemini import call_openrouter_pdf
 from fn_slice_page_pdf import slice_pdf_pages
 from fn_pdf_to_byte import to_pdf_bytes
 from fn_chunk_number import locate_chunks
+from fn_pdf_text_table import text_with_tables
 import os
 import json
 
@@ -113,7 +114,7 @@ for i in list_pdf:
 
     start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
     
-    start_chunk_page = [x if i == 6 or i == 7 else None for i, x in enumerate(start_chunk_page)]
+    start_chunk_page = [x if i == 6 or i == 5 else None for i, x in enumerate(start_chunk_page)]
 
 
     for i, x in enumerate(start_chunk_page):
@@ -137,6 +138,7 @@ for i in list_pdf:
             end_page=end_page
         )
 
+        text = None
 
         if i == 0 and start_page is not None and end_page is not None:
             print("do 1")
@@ -162,6 +164,12 @@ for i in list_pdf:
         elif i == 5 and start_page is not None and end_page is not None:
             from fn_chunk5 import schema_prompt
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            print("slice:", start_page, end_page, "bytes:", len(chunk_pdf_bytes), "head:", chunk_pdf_bytes[:8])
+            print(type(chunk_pdf_bytes))
+            
+            text = text_with_tables(chunk_pdf_bytes)
+            print(text)
+            chunk_pdf_bytes = None
 
         elif i == 6 and start_page is not None and end_page is not None:
             from fn_chunk6 import schema_prompt
@@ -185,6 +193,7 @@ for i in list_pdf:
             prompt=prompt,
             schema=schema,
             pdf_bytes=chunk_pdf_bytes,
+            text = text,
             engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
             temperature=0.00,
         )
