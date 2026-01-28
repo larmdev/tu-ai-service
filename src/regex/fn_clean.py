@@ -1,4 +1,4 @@
-def clean (list_un_space:list,data1):
+def clean_all (list_un_space:list,data1):
 
     #find str -> " า" เป็น "อำ"
 

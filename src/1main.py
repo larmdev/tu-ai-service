@@ -157,7 +157,7 @@ try:
 
         start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
         
-        start_chunk_page = [x if i == 3 or i == 4 else None for i, x in enumerate(start_chunk_page)]
+        start_chunk_page = [x if i == 5 or i == 6 else None for i, x in enumerate(start_chunk_page)]
 
 
         for i, x in enumerate(start_chunk_page):
@@ -190,7 +190,7 @@ try:
 
             elif i == 1 and start_page is not None and end_page is not None:
                 from fn_chunk.fn_chunk2 import schema_prompt
-                schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+                schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 2 and start_page is not None and end_page is not None:
                 from fn_chunk.fn_chunk3 import schema_prompt
@@ -207,11 +207,11 @@ try:
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 5 and start_page is not None and end_page is not None:
-                from fn_chunk.fn_chunk5_1_2 import schema_prompt
+                from fn_chunk.fn_chunk5_1_3 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
-                text = text_with_tables(chunk_pdf_bytes)
-                chunk_pdf_bytes = None
+                # text = text_with_tables(chunk_pdf_bytes)
+                # chunk_pdf_bytes = None
 
             elif i == 6 and start_page is not None and end_page is not None:
                 from fn_chunk.fn_chunk6_1_2 import schema_prompt
