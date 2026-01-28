@@ -120,59 +120,24 @@ def load_pdf_and_name(url: str):
         raise Exception(f"Download failed: {e}")
 
 async def process_and_save_chunk(chunk_idx, start_page, end_page, pdf_bytes, fileName, start_chunk_page):
-    section_str = "Unknown"
+    section_str = chunk_idx
     try:
-        # --- Config Mapping ---
-        chunk_config = {
-            0: {"module": "fn_chunk1",   "section": "1"},
-            1: {"module": "fn_chunk2",   "section": "2"},
-            2: {"module": "fn_chunk3",   "section": "3"},
-            3: {"module": "fn_chunk4_1", "section": "4_1"},
-            4: {"module": "fn_chunk4_2", "section": "4_2"},
-            5: {"module": "fn_chunk5",   "section": "5"},
-            6: {"module": "fn_chunk6",   "section": "6"},
-            7: {"module": "fn_chunk7",   "section": "7"},
-            8: {"module": "fn_chunk8",   "section": "8"},
-            9: {"module": "fn_chunk9",   "section": "9"},
-        }
+        if chunk_idx ==4 :
+            return "skipppp this is chunk 4"
 
-        if chunk_idx not in chunk_config:
-            return
+        #########################################
 
-        config = chunk_config[chunk_idx]
-        module_name = config["module"]
-        section_str = config["section"]
-
-        logger.info(f"[{fileName}] Processing Section {section_str} (Pages {start_page}-{end_page})...")
-
-        # Dynamic Import
-        module = __import__(module_name, fromlist=['schema_prompt'])
-        schema, prompt = module.schema_prompt()
-
-        if prompt is None: 
-            logger.warning(f"[{fileName}] Section {section_str}: Prompt is None, skipping.")
-            return
-
-        # Slice PDF
-        chunk_pdf_bytes = slice_pdf_pages(
-            pdf_bytes=pdf_bytes, start_page=start_page, end_page=end_page
-        )
-
-        # AI Process
-        data = call_openrouter_pdf(
-            api_key=OPEN_ROUTER_KEY, model=MODEL, prompt=prompt, schema=schema,
-            pdf_bytes=chunk_pdf_bytes, engine="pdf-text", temperature=0.00,
-        )
-        
         if data:
         # เรียกใช้ฟังก์ชันจัดเรียง (data จะถูกเรียง key ใหม่ตาม schema เป๊ะๆ)
             logger.info(data)
-            data = reorder_data_by_schema(data, schema)
+            data = reorder_data_by_schema(data, master_schema)
             logger.info(f"-------- reorder --------\n{data}")
 
         # Save File
         save_dir = os.path.join(TARGET_BASE_DIR, fileName)
         os.makedirs(save_dir, exist_ok=True)
+        if chunk_idx > 4 :
+            section_str = str(section_str+1)
 
         file_path = os.path.join(save_dir, f"g{section_str}.json")
 
@@ -181,8 +146,6 @@ async def process_and_save_chunk(chunk_idx, start_page, end_page, pdf_bytes, fil
             "section": section_str,
             "data": data
         }
-
-        
 
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(output_content, f, ensure_ascii=False, indent=4)

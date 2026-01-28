@@ -1,7 +1,7 @@
+def add_field_lost (data1, master_schema):
 
--> นำเข้า schema หลัก
-
-list -> []
-object -> {}
-string -> ""
-integer -> 0
+    return data1
+# list -> []
+# object -> {}
+# string -> ""
+# integer -> 0
