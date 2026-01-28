@@ -1,0 +1,33 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches: [ release ]
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: tu-ai-service
+  AZURE_RESOURCE_GROUP: tu
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Deploy to Azure Web App from source
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: .
+    
+    - name: Get deployment URL
+      run: |
+        echo "Deployment successful!"
+        echo "App URL: https://tu-ai-service-a5fnave5fqg0bzb5.southeastasia-01.azurewebsites.net"
