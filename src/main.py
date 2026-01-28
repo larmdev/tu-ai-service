@@ -7,11 +7,11 @@ import asyncio
 import httpx
 from dotenv import load_dotenv
 
-from fn_gemini import call_openrouter_pdf
-from fn_slice_page_pdf import slice_pdf_pages
-from fn_pdf_to_byte import to_pdf_bytes
-from fn_chunk_number import locate_chunks
-from fn_pdf_from_url import load_pdf_from_url
+from function.fn_gemini import call_openrouter_pdf
+from function.fn_slice_page_pdf import slice_pdf_pages
+from function.fn_pdf_to_byte import to_pdf_bytes
+from function.fn_chunk_number import locate_chunks
+from function.fn_pdf_from_url import load_pdf_from_url
 
 
 
@@ -40,40 +40,40 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
 
         schema, prompt = None, None
         if chunk_idx == 0:
-            from fn_chunk1 import schema_prompt
+            from fn_chunk.fn_chunk1 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 1:
-            from fn_chunk2 import schema_prompt
+            from fn_chunk.fn_chunk2 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 2:
-            from fn_chunk3 import schema_prompt
+            from fn_chunk.fn_chunk3 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 3:
-            from fn_chunk4_2 import schema_prompt
+            from fn_chunk.fn_chunk4_2 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 5:
             # กลับมาเริ่ม fn_chunk5 ตามที่คุณต้องการ
-            from fn_chunk5 import schema_prompt
+            from fn_chunk.fn_chunk5 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 6:
-            from fn_chunk6 import schema_prompt
+            from fn_chunk.fn_chunk6 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 7:
-            from fn_chunk7 import schema_prompt
+            from fn_chunk.fn_chunk7 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 8:
-            from fn_chunk8 import schema_prompt
+            from fn_chunk.fn_chunk8 import schema_prompt
             schema, prompt = schema_prompt()
 
         elif chunk_idx == 9:
-            from fn_chunk9 import schema_prompt
+            from fn_chunk.fn_chunk9 import schema_prompt
             schema, prompt = schema_prompt()
 
         # ตัด PDF

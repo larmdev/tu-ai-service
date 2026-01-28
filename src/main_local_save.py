@@ -13,10 +13,10 @@ import sys
 
 # Import ฟังก์ชันของคุณ
 # ตรวจสอบว่าไฟล์เหล่านี้อยู่ในโฟลเดอร์เดียวกับ main หรือใน src ตามที่ตั้งค่า Docker
-from fn_gemini import call_openrouter_pdf
-from fn_slice_page_pdf import slice_pdf_pages
-from fn_chunk_number import locate_chunks
-from fn_reorder_data_by_schema import reorder_data_by_schema
+from function.fn_gemini import call_openrouter_pdf
+from function.fn_slice_page_pdf import slice_pdf_pages
+from function.fn_chunk_number import locate_chunks
+from function.fn_reorder_data_by_schema import reorder_data_by_schema
 
 load_dotenv()
 

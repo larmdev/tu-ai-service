@@ -31,7 +31,7 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
         """
 
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
-ข้อมูลจากหมวดที่ 
+ข้อมูลจากหมวดที่ 5
 
 curriculumId เป็น null
 
@@ -77,7 +77,8 @@ ploTeachingAssessment (เป็นตารางที่มี 3 column 'ผ�
                             "description": {"type": ["string", "null"]},
                             "relatedPlos": {"type": ["string", "null"]}
                         },
-                        "additionalProperties": False
+                        "additionalProperties": False,
+                        "required":["description","relatedPlos"]
                     },
                     "professionalCharacteristics": {
                         "type": ["object", "null"],
@@ -85,7 +86,8 @@ ploTeachingAssessment (เป็นตารางที่มี 3 column 'ผ�
                             "description": {"type": ["string", "null"]},
                             "relatedPlos": {"type": ["string", "null"]}
                         },
-                        "additionalProperties": False
+                        "additionalProperties": False,
+                        "required":["description","relatedPlos"]
                     }
                 },
                 "additionalProperties": False

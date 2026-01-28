@@ -29,13 +29,13 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
 
 curriculumId
 
-learningAssessment การประเมินผลการเรียนรู้ของนักศึกษา
+learningAssessment การประเมินผลการเรียนรู้ของนักศึกษา (เอาเนื้อหาในหัวข้อนี้มาทั้งหมด)
 
-standardVerificationProcess กระบวนการทวนสอบมาตรฐานผลสัมฤทธิ์ของนักศึกษา
+standardVerificationProcess กระบวนการทวนสอบมาตรฐานผลสัมฤทธิ์ของนักศึกษา (เอาเนื้อหาในหัวข้อนี้มาทั้งหมด)
 
-appealProcess การอุทธรณ์ผลการศึกษาของนักศึกษา
+appealProcess การอุทธรณ์ผลการศึกษาของนักศึกษา (เอาเนื้อหาในหัวข้อนี้มาทั้งหมด)
 
-graduationCriteria เกณฑ์การสําเร็จการศึกษาตามหลักสูตร
+graduationCriteria เกณฑ์การสําเร็จการศึกษาตามหลักสูตร (เอาเนื้อหาในหัวข้อนี้มาทั้งหมด)
     """
 
     schema = {

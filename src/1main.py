@@ -1,15 +1,15 @@
 
-from fn_gemini import call_openrouter_pdf
-from fn_slice_page_pdf import slice_pdf_pages
-from fn_pdf_to_byte import to_pdf_bytes
-from fn_chunk_number import locate_chunks
-from fn_pdf_text_table import text_with_tables
+from function.fn_gemini import call_openrouter_pdf
+from function.fn_slice_page_pdf import slice_pdf_pages
+from function.fn_pdf_to_byte import to_pdf_bytes
+from function.fn_chunk_number import locate_chunks
+from function.fn_pdf_text_table import text_with_tables
 import os
 import json
 
-import sys
-import sys
 
+import sys
+import sys
 class _Tee:
     def __init__(self, *streams):
         self.streams = streams
@@ -157,7 +157,7 @@ try:
 
         start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
         
-        start_chunk_page = [x if i == 2 or i == 1 else None for i, x in enumerate(start_chunk_page)]
+        start_chunk_page = [x if i == 1 or i == 2 else None for i, x in enumerate(start_chunk_page)]
 
 
         for i, x in enumerate(start_chunk_page):
@@ -185,46 +185,46 @@ try:
 
             if i == 0 and start_page is not None and end_page is not None:
                 print("do 1")
-                from fn_chunk1 import schema_prompt
+                from fn_chunk.fn_chunk1 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 1 and start_page is not None and end_page is not None:
-                from fn_chunk2 import schema_prompt
+                from fn_chunk.fn_chunk2 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 2 and start_page is not None and end_page is not None:
-                from fn_chunk3 import schema_prompt
+                from fn_chunk.fn_chunk3 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 3 and start_page is not None and end_page is not None:
-                from fn_chunk4_1 import schema_prompt
+                from fn_chunk.fn_chunk4_1_2 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 4 and start_page is not None and end_page is not None:
-                from fn_chunk4_2 import schema_prompt
+                from fn_chunk.fn_chunk4_2 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 5 and start_page is not None and end_page is not None:
-                from fn_chunk5 import schema_prompt
+                from fn_chunk.fn_chunk5_2 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
                 text = text_with_tables(chunk_pdf_bytes)
                 chunk_pdf_bytes = None
 
             elif i == 6 and start_page is not None and end_page is not None:
-                from fn_chunk6 import schema_prompt
+                from fn_chunk.fn_chunk6_1_2 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 7 and start_page is not None and end_page is not None:
-                from fn_chunk7 import schema_prompt
+                from fn_chunk.fn_chunk7 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 8 and start_page is not None and end_page is not None:
-                from fn_chunk8 import schema_prompt
+                from fn_chunk.fn_chunk8 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 9 and start_page is not None and end_page is not None:
-                from fn_chunk9 import schema_prompt
+                from fn_chunk.fn_chunk9 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             data = call_openrouter_pdf(
