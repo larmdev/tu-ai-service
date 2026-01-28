@@ -134,10 +134,25 @@ def call_openrouter_pdf(
         "temperature": temperature,
     }
 
+    try:
+        resp = requests.post(url, headers=headers, json=payload)  # no timeout
+        resp.raise_for_status()
+        result = resp.json()
+    except requests.exceptions.HTTPError as e:
+        # ✅ ดักจับ Error ตรงนี้
+        print("\n" + "="*30)
+        print(f"❌ API Error ({e.response.status_code}):")
+        
+        # ดึงข้อความที่ API ตอบกลับมา (เช่น model not found)
+        print(e.response.text)  
+        
+        print("="*30 + "\n")
+        raise  # สั่งให้ Error ทำงานต่อ (หรือจะ return None ถ้าอยากให้โปรแกรมไปต่อ)
 
-    resp = requests.post(url, headers=headers, json=payload)  # no timeout
-    resp.raise_for_status()
-    result = resp.json()
+    except Exception as e:
+        # ดัก Error อื่นๆ (เช่น เน็ตหลุด, JSON พัง)
+        print(f"❌ Unexpected Error: {e}")
+        raise
 
     content = result["choices"][0]["message"]["content"]
     return parse_openrouter_content(content)
