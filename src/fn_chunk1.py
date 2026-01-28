@@ -12,20 +12,20 @@ def schema_prompt(chunk_pdf_bytes: bytes | None = None):
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
 ข้อมูลจากหมวดที่ 1
 
-curriculumId
+curriculumId Null
 
-approvalStatus
-institutionName
+approvalStatus ให้เป็น
+institutionName ให้ค่าเป็น "มหาวิทยาลัยธรรมศาสตร์"
 
 facultyName คณะ/วิทยาลัย/สถาบัน (หากมี ศูนย์อยู่ด้านหลัง ไม่ต้องเอารายละเอียดศูนย์)
-facultyCode
+facultyCode Null
 
 approvalDate
 startDate
 
 อยู่ในหัวข้อ รหัสและชื่อหลักสูตร
 curriculumCodeTh รหัสหลักสูตร
-curriculumCodeEn
+curriculumCodeEn Null
 curriculumNameTh ชื่อหลักสูตรภาษาไทย
 curriculumNameEn ชื่อหลักสูตรภาษาอังกฤษ
 
@@ -36,7 +36,7 @@ degreeFullEn ภาษาอังกฤษ ชื่อเต็ม
 degreeAbbrEn ภาษาอังกฤษ ชื่อย่อ
 
 อยู่ในหัวข้อ วิชาเอก
-majorsData
+majorsData (หากไม่มีให้เป็น Null)
   majorTh ภาษาไทย
   majorEn ภาษาอังกฤษ
 
@@ -48,7 +48,7 @@ curriculumFormat ให้เลือกค่าที่ติ้ก "continu
 
 อยู่ในหัวข้อ ประเภทของหลักสูตร
 curriculumType ให้เลือกค่าที่ติ้ก "academic" หลักสูตรปริญญาตรีทางวิชาการ,"progressive-academic" หลักสูตรปริญญาตรีแบบก้าวหน้าทางวิชาการ,"professional" หลักสูตรปริญญาตรีทางวิชาชีพหรือปฏิบัติการ,"progressive-professional" หลักสูตรปริญญาตรีแบบก้าวหน้าทางวิชาชีพหรือปฏิบัติการ
-curriculumCategory
+curriculumCategory Null
 
 plan1
   isPlan ค่าเป็น false
@@ -76,7 +76,7 @@ admissionType null
 
 อยู่ในหัวข้อ ความร่วมมือกับสถาบันอื่น
 isJointProgram เลือกค่าจากที่ติ้ก false เป็นหลักสูตรของสถาบันโดยเฉพาะ ,true เป็นหลักสูตรที่ได้รับความร่วมมือสนับสนุนจากสถาบันอื่น
-jointInstitutionName รายละเอียด หากมีการติ้ก ความร่วมมือสนับสนุนจากสถาบันอื่น
+jointInstitutionName รายละเอียด หากมีการติ้ก ความร่วมมือสนับสนุนจากสถาบันอื่น หากไม่มีให้เป็น Null
 
 อยู่ในหัวข้อ การให้ปริญญาแก่ผู้สําเร็จการศึกษา
 degreeConferralType เลือกค่าจากที่ติ้ก "single" ให้ปริญญาเพียงสาขาวิชาเดียว, "multiple" ให้ปริญญามากกว่า 1 สาขาวิชา
