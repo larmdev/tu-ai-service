@@ -2,7 +2,6 @@ from .fn_add_field_lost import add_field_lost
 from regex.fn_clean_all import clean_all
 def clean (master_schema,data1 ):
 
-    print("before",data1)
     students_per_year = data1.get("studentsPerYear")
 
     plans = data1.get("studentAdmissionPlans")

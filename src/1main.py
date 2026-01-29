@@ -4,6 +4,7 @@ from function.fn_slice_page_pdf import slice_pdf_pages
 from function.fn_pdf_to_byte import to_pdf_bytes
 from function.fn_chunk_number import locate_chunks
 from function.fn_pdf_text_table import text_with_tables
+from function.fn_reorder_data_by_schema import reorder_by_schema
 import os
 import json
 
@@ -109,44 +110,6 @@ try:
     #####
 
 
-    def reorder_by_schema(data: Any, schema: Dict[str, Any]) -> Any:
-        # ถ้า data เป็น None ก็คืน None
-        if data is None:
-            return None
-
-        schema_type = schema.get("type")
-
-        # schema_type อาจเป็น "object" หรือ ["object","null"] ฯลฯ
-        is_object = schema_type == "object" or (isinstance(schema_type, list) and "object" in schema_type)
-        is_array  = schema_type == "array"  or (isinstance(schema_type, list) and "array" in schema_type)
-
-        if is_object and isinstance(data, dict):
-            props = schema.get("properties", {})
-            ordered: Dict[str, Any] = {}
-
-            for k, k_schema in props.items():  # ลำดับตาม schema["properties"]
-                v = data.get(k, None)
-
-                # ถ้า key นี้เป็น object/array ซ้อนอยู่ ก็เรียงต่อ
-                ordered[k] = reorder_by_schema(v, k_schema)
-
-            return ordered
-
-        if is_array and isinstance(data, list):
-            items_schema = schema.get("items", {})
-
-            # ถ้า items เป็น object ก็ reorder ทีละ element
-            items_type = items_schema.get("type")
-            items_is_object = items_type == "object" or (isinstance(items_type, list) and "object" in items_type)
-
-            if items_is_object:
-                return [reorder_by_schema(item, items_schema) for item in data]
-
-            # array ของ primitive ก็คืนเหมือนเดิม
-            return data
-
-        # primitive (string/int/ฯลฯ) คืนค่าเดิม
-        return data
 
     for i in list_pdf:
         PDF_URL = i
@@ -318,7 +281,7 @@ try:
                 data1 = clean (master_schema=master_schema,data1=data1)
 
             print("<data before reoreder>",data1)
-
+            print("<master_schema>",master_schema)
             data1 = reorder_by_schema(data1, master_schema)
             print("<data after reorder>")
             print(json.dumps(data1, ensure_ascii=False, indent=2))

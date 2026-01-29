@@ -1,66 +1,74 @@
-def reorder_by_schema(data, schema, no_deep_keys=None):
-    if no_deep_keys is None:
-        no_deep_keys = set()
-    else:
-        no_deep_keys = set(no_deep_keys)
+def reorder_by_schema(data, schema):
+    """
+    เรียง key ตาม schema โดย:
+    - object ที่มี properties -> เรียงตาม properties
+    - object ที่ไม่มี properties แต่มี additionalProperties -> เก็บ key ทั้งหมดไว้ (เช่น years)
+    - array -> recurse ตาม items
+    - รองรับ type เป็น list เช่น ["object","null"]
+    """
 
     if data is None or not isinstance(schema, dict):
         return data
 
-    sch_type = schema.get("type")
-    if isinstance(sch_type, list):
-        if "object" in sch_type:
-            sch_type = "object"
-        elif "array" in sch_type:
-            sch_type = "array"
+    # ---- normalize schema type (รองรับ list เช่น ["object","null"]) ----
+    t = schema.get("type")
+    if isinstance(t, list):
+        if "object" in t:
+            schema_type = "object"
+        elif "array" in t:
+            schema_type = "array"
+        elif len(t) > 0:
+            schema_type = t[0]
         else:
-            sch_type = sch_type[0] if sch_type else None
+            return data
+    else:
+        schema_type = t
 
-    # ---------- OBJECT ----------
-    if sch_type == "object" and isinstance(data, dict):
+    # ---- OBJECT ----
+    if schema_type == "object" and isinstance(data, dict):
         props = schema.get("properties")
         addl = schema.get("additionalProperties", None)
 
-        # 1) ถ้ามี properties -> เรียงตาม properties ก่อน
-        if isinstance(props, dict) and props:
+        # 1) มี properties -> เรียงตาม properties
+        if isinstance(props, dict) and len(props) > 0:
             ordered = {}
+
+            # เรียงตาม schema.properties
             for key, sub_schema in props.items():
-                if key not in data:
-                    continue
+                if key in data:
+                    ordered[key] = reorder_by_schema(data[key], sub_schema)
 
-                # ✅ ยกทั้งก้อนถ้าอยู่ใน no_deep_keys
-                if key in no_deep_keys:
-                    ordered[key] = data[key]
-                else:
-                    ordered[key] = reorder_by_schema(data[key], sub_schema, no_deep_keys)
-
-            # 2) key ที่ไม่อยู่ใน properties
+            # extra keys (ที่ schema ไม่กำหนด)
             extra_keys = [k for k in data.keys() if k not in props]
 
-            # additionalProperties เป็น dict -> recurse ต่อ
+            # ถ้า additionalProperties เป็น dict -> recurse ด้วย schema นั้น
             if isinstance(addl, dict):
                 for k in extra_keys:
-                    ordered[k] = reorder_by_schema(data[k], addl, no_deep_keys)
-            # additionalProperties True/None -> เก็บต่อท้าย
-            elif addl is True or addl is None:
+                    ordered[k] = reorder_by_schema(data[k], addl)
+
+            # ถ้า additionalProperties == False -> ทิ้ง extra
+            elif addl is False:
+                pass
+
+            # ถ้า True หรือไม่กำหนด -> เก็บ extra ต่อท้าย
+            else:
                 for k in extra_keys:
                     ordered[k] = data[k]
-            # additionalProperties False -> ทิ้ง extra
 
             return ordered
 
-        # 2) ถ้าไม่มี properties (เช่น years) แต่มี additionalProperties -> ต้องคง key ทั้งหมดไว้
+        # 2) ไม่มี properties แต่มี additionalProperties (เช่น years)
         if isinstance(addl, dict):
-            # recurse ตาม schema ของ additionalProperties (เช่น integer/null)
-            return {k: reorder_by_schema(v, addl, no_deep_keys) for k, v in data.items()}
+            # เก็บทุก key และถ้าต้องการ recurse ตาม additionalProperties ก็ทำได้
+            return {k: reorder_by_schema(v, addl) for k, v in data.items()}
 
-        # 3) ไม่มีทั้ง properties และ additionalProperties เป็น dict -> คืน data เดิม
+        # 3) ไม่มี props และไม่มี additionalProperties -> คืนเดิม
         return dict(data)
 
-    # ---------- ARRAY ----------
-    if sch_type == "array" and isinstance(data, list):
+    # ---- ARRAY ----
+    if schema_type == "array" and isinstance(data, list):
         item_schema = schema.get("items", {})
-        return [reorder_by_schema(item, item_schema, no_deep_keys) for item in data]
+        return [reorder_by_schema(item, item_schema) for item in data]
 
-    # ---------- PRIMITIVE ----------
+    # ---- PRIMITIVE ----
     return data
