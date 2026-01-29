@@ -369,3 +369,7 @@ async def msg():
 @app.get("/api/msg1")
 async def msg1():
     return {"status": 200, "message": "API is running. 1"}
+
+@app.get("/api/msg2")
+async def msg2():
+    return {"status": 200, "message": "API is running. 2"}
