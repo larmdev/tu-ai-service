@@ -19,8 +19,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Deploy to Azure Web App from source
+    - name: Deploy to Azure Web App (Python - no registry)
       uses: azure/webapps-deploy@v2
+      id: deploy
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
