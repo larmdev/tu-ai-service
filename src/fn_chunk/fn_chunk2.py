@@ -38,10 +38,6 @@ studentLimitationStrategies หากมีหลายข้อ ให้ ค�
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["string", "null"],
-                "description": "UUID ของหลักสูตร (ถ้าไม่พบให้เป็น null)"
-            },
 
             "admissionType2": {
                 "type": ["string", "null"],
@@ -133,10 +129,6 @@ studentLimitationStrategies หากมีหลายข้อ ให้ ค�
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["string", "null"],
-                "description": "UUID ของหลักสูตร (ถ้าไม่พบให้เป็น null)"
-            },
 
             "admissionType2": {
                 "type": ["string", "null"],

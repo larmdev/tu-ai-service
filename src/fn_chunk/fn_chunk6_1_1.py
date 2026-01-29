@@ -40,7 +40,6 @@ amount 'บาท/หลักสูตร'
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "curriculumNameG6": {"type": ["string", "null"]},
 
             "physicalReadiness": {
@@ -113,7 +112,6 @@ amount 'บาท/หลักสูตร'
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "curriculumNameG6": {"type": ["string", "null"]},
 
             "physicalReadiness": {

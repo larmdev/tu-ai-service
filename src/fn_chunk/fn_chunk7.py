@@ -17,9 +17,6 @@ graduationCriteria เกณฑ์การสําเร็จการศึ�
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["string", "null"]
-            },
             "learningAssessment": {
                 "type": ["string", "null"]
             },
@@ -39,9 +36,6 @@ graduationCriteria เกณฑ์การสําเร็จการศึ�
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["string", "null"]
-            },
             "learningAssessment": {
                 "type": ["string", "null"]
             },

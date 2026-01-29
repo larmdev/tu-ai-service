@@ -32,7 +32,6 @@ courseLecturers (เป็นตารางที่มี 6 column ลำด�
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "breakEvenAnalysis": {
                 "type": ["object", "null"],
                 "properties": {

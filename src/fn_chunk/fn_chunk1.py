@@ -11,12 +11,10 @@ institutionName ให้ค่าเป็น "มหาวิทยาลั�
 facultyName คณะ/วิทยาลัย/สถาบัน (หากมี ศูนย์อยู่ด้านหลัง ไม่ต้องเอารายละเอียดศูนย์)
 facultyCode Null
 
-approvalDate
-startDate
 
 อยู่ในหัวข้อ รหัสและชื่อหลักสูตร
 curriculumCodeTh รหัสหลักสูตร
-curriculumCodeEn Null
+curriculumCodeEn รหัสหลักสูตร
 curriculumNameTh ชื่อหลักสูตรภาษาไทย
 curriculumNameEn ชื่อหลักสูตรภาษาอังกฤษ
 
@@ -138,16 +136,13 @@ remark เหตุผลในการเลือกให้หลักส�
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "approvalStatus": {
                 "type": "string",
-                "enum": ["approved", "in-progress", "rejected", "cancelled", "other"],
+                "enum": ["open-admission", "close-admission", "closed-incomplete", "suspended-admission", "not-open-admission"],
             },
             "institutionName": {"type": ["string", "null"]},
             "facultyName": {"type": ["string", "null"]},
             "facultyCode": {"type": ["string", "null"]},
-            "approvalDate": {"type": ["string", "null"], "format": "date-time"},
-            "startDate": {"type": ["string", "null"], "format": "date-time"},
 
             "curriculumCodeTh": {"type": ["string", "null"]},
             "curriculumNameTh": {"type": ["string", "null"]},
@@ -287,7 +282,6 @@ remark เหตุผลในการเลือกให้หลักส�
         },
 
         "required": [
-            "curriculumId",
             "approvalStatus",
             "curriculumLevel",
             "curriculumFormat",
@@ -308,7 +302,6 @@ remark เหตุผลในการเลือกให้หลักส�
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "approvalStatus": {
                 "type": "string",
                 "enum": ["approved", "in-progress", "rejected", "cancelled", "other"],
@@ -316,8 +309,6 @@ remark เหตุผลในการเลือกให้หลักส�
             "institutionName": {"type": ["string", "null"]},
             "facultyName": {"type": ["string", "null"]},
             "facultyCode": {"type": ["string", "null"]},
-            "approvalDate": {"type": ["string", "null"], "format": "date-time"},
-            "startDate": {"type": ["string", "null"], "format": "date-time"},
 
             "curriculumCodeTh": {"type": ["string", "null"]},
             "curriculumNameTh": {"type": ["string", "null"]},
@@ -465,7 +456,6 @@ remark เหตุผลในการเลือกให้หลักส�
             "remark": {"type": ["string", "null"]},
         },
         "required": [
-            "curriculumId",
             "approvalStatus",
             "curriculumLevel",
             "curriculumFormat",

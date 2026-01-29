@@ -28,9 +28,6 @@ studentCountQuality ด้านจํานวนนักศึกษา
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["string", "null"]
-            },
             "curriculumPlanningAndDevelopment": {
                 "type": ["string", "null"]
             },
@@ -83,9 +80,6 @@ studentCountQuality ด้านจํานวนนักศึกษา
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["string", "null"]
-            },
             "curriculumPlanningAndDevelopment": {
                 "type": ["string", "null"]
             },

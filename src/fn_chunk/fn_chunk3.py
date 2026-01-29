@@ -23,7 +23,6 @@ programLearningOutcomes
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": { "type": ["string", "null"] },
 
             "educationalPhilosophy": {
                 "type": ["string", "null"]
@@ -74,7 +73,6 @@ programLearningOutcomes
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": { "type": ["string", "null"] },
 
             "educationalPhilosophy": {
                 "type": ["string", "null"]

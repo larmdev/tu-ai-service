@@ -34,6 +34,8 @@ class ChunkRequest(BaseModel):
 
 async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId, fileName, start_chunk_page):
     try:
+        # if chunk_idx != 3:
+        #     return
 
         if chunk_idx == 4 :
             return "chunk 4"
@@ -229,18 +231,38 @@ async def background_manager(body: ChunkRequest, pdf_bytes: bytes):
     if tasks:
         await asyncio.gather(*tasks)
 
-@app.post("/api/curriculum/file")
-async def extract_curr(body: ChunkRequest, background_tasks: BackgroundTasks):
-    # โหลด PDF
+# @app.post("/api/curriculum/file")
+# async def extract_curr(body: ChunkRequest, background_tasks: BackgroundTasks):
+#     # โหลด PDF
+#     try:
+#         pdf_bytes = load_pdf_from_url(body.url)
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=f"Cannot load PDF: {str(e)}")
+
+#     # ทำงาน Background
+#     background_tasks.add_task(background_manager, body, pdf_bytes)
+
+#     # ตอบกลับทันที
+#     return {
+#         "status": 200,
+#         "message": "Success. Processing started in background."
+#     }
+
+async def background_manager_with_download(body: ChunkRequest):
     try:
         pdf_bytes = load_pdf_from_url(body.url)
+        await background_manager(body, pdf_bytes)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Cannot load PDF: {str(e)}")
+        print(f"Background error: {e}")
 
-    # ทำงาน Background
-    background_tasks.add_task(background_manager, body, pdf_bytes)
 
-    # ตอบกลับทันที
+@app.post("/api/curriculum/file")
+async def extract_curr(body: ChunkRequest, background_tasks: BackgroundTasks):
+
+    # ส่งไป background ทั้งก้อน (รวม download)
+    background_tasks.add_task(background_manager_with_download, body)
+
+    # ตอบกลับทันที (ไม่รออะไรเลย)
     return {
         "status": 200,
         "message": "Success. Processing started in background."

@@ -58,7 +58,6 @@ projectResearchRequirement จากหัวข้อ ข้อกำหนด�
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
 
 
             "head_plos_yearEndLearningOutcomeExpectations":{"type":["array"]},

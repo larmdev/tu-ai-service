@@ -29,9 +29,6 @@ curriculumImprovementWeaknesses เป็นค่าของ ที่เป�
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["null"]
-            },
 
             "courseTeachingEffectiveness": {
                 "type": ["string", "null"]
@@ -95,10 +92,7 @@ curriculumImprovementWeaknesses เป็นค่าของ ที่เป�
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {
-                "type": ["null"]
-            },
-
+            
             "courseTeachingEffectiveness": {
                 "type": ["string", "null"]
             },

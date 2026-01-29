@@ -66,7 +66,6 @@ ploTeachingAssessment (เป็นตารางที่มี 3 column 'ผ�
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
 
             "studentCharacteristicDevelopment": {
                 "type": ["object", "null"],
@@ -133,7 +132,6 @@ ploTeachingAssessment (เป็นตารางที่มี 3 column 'ผ�
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
 
             "studentCharacteristicDevelopment": {
                 "type": ["object", "null"],

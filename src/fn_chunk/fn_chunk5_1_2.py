@@ -19,7 +19,6 @@ curriculumMapping (ตารางที่มี 4 column หลัก 'รา�
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "head_plos":{"type":["array","null"]},
             "curriculumMapping": {
                 "type": ["array", "null"],

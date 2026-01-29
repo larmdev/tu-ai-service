@@ -39,7 +39,6 @@ curriculumStructures
     schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "educationSystem": {"type": ["string", "null"]},
             "isMaxStudyDurationYears": {"type": ["boolean", "null"]},
             "maxStudyDurationYears": {"type": ["string", "null"]},
@@ -58,7 +57,7 @@ curriculumStructures
             },
             "curriculumStudySystem": {
                 "type": ["string", "null"],
-                "enum": ["ONSITE" ,"ONLINE" ,"HYBRID"],
+                "enum": ["onsite" ,"online" ,"hybrid"],
                 },
             "curriculumStudySystemOther": {"type": ["string", "null"]},
             "transferCurriculumLevel": {
@@ -98,7 +97,6 @@ curriculumStructures
     master_schema = {
         "type": "object",
         "properties": {
-            "curriculumId": {"type": ["string", "null"]},
             "educationSystem": {"type": ["string", "null"]},
             "isMaxStudyDurationYears": {"type": ["boolean", "null"]},
             "maxStudyDurationYears": {"type": ["string", "null"]},
@@ -159,6 +157,8 @@ curriculumStructures
                         "credits": {"type": ["integer", "null"]},
                         "lecturePracticeSelfStudy": {"type": ["string", "null"]},
                         "courseGroup": {"type": ["string", "null"]},
+                        "subCourseGroup": {"type": ["string", "null"]},
+                        "level": {"type": ["integer", "null"]},
                         "semester": {"type": ["integer", "null"]},
                         "academicYear": {"type": ["integer", "null"]},
                     },
