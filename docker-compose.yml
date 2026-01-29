@@ -1,30 +1,27 @@
-version: '3.8'
+version: "3.8"
 
 services:
   api:
     build:
       context: .
       dockerfile: Dockerfile_test
-    image: pdf_extractor_image
     container_name: pdf_extractor_container
-    
-    # --- เพิ่ม 2 บรรทัดนี้ ---
-    # สั่งให้เข้าไปทำงานในโฟลเดอร์ src (ที่มีไฟล์ python กองรวมกันอยู่)
-    working_dir: /app/src  
-    # สั่งรัน uvicorn จากในนั้น (ไม่ต้องมี src. นำหน้าแล้ว)
-    command: uvicorn main_local_save:app --host 0.0.0.0 --port 8000
+
+    working_dir: /app/src
+    command: uvicorn main_local_save:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
 
     ports:
       - "8000:8000"
+
     volumes:
-      # อันนี้สำคัญมาก:
-      # เช็คว่า Path ซ้ายมือ (เครื่องคุณ) ชี้ไปที่ Folder ที่อยากให้ไฟล์โผล่ออกมาจริงๆ
-      - ~/Desktop/pimdej/curriculum_tu/data:/app/data
+      - ./data:/app/data
       - ./src:/app/src
+
     environment:
       - OPEN_ROUTER_KEY=${OPEN_ROUTER_KEY}
       - MODEL=${MODEL}
-      # ปรับ Path Output ให้ถอยหลังกลับไป 1 ขั้น (../data) เพราะเรามุดเข้า src มาแล้ว
-      # หรือจะใช้ Absolute Path แบบนี้ก็ได้ (ชัวร์สุด):
       - OUTPUT_DIR=/app/data
+      - WATCHFILES_FORCE_POLLING=true
+      - PYTHONDONTWRITEBYTECODE=1
+
     restart: always
