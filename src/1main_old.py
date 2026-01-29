@@ -166,12 +166,11 @@ try:
             
         print(start_chunk_page)
         for i in range(len(start_chunk_page)-1) :
-            if i != 1:
-                continue ####################################
-            if i == 4 :
-                continue
+            if i < 4 :
+                continue ##########################
             start_page = start_chunk_page[i]
             end_page = start_chunk_page[i + 1]
+
             print("                -------------             ")
             
             print("i =",i,"->",start_page,"and",end_page)
@@ -187,6 +186,7 @@ try:
             text = None
 
             if i == 0 and start_page is not None and end_page is not None:
+                print("do 1")
                 from fn_chunk.fn_chunk1 import schema_prompt
                 schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
@@ -199,10 +199,12 @@ try:
                 schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 3 and start_page is not None and end_page is not None:
+                print(4_1)
                 from fn_chunk.fn_chunk4_1_1 import schema_prompt
                 schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
             elif i == 4 and start_page is not None and end_page is not None:
+                print(4_2)
                 from fn_chunk.fn_chunk4_2 import schema_prompt
                 schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
@@ -229,101 +231,28 @@ try:
                 from fn_chunk.fn_chunk9 import schema_prompt
                 schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
-            data1 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+            data = call_openrouter_pdf(
+                api_key=OPEN_ROUTER_KEY,
+                model=MODEL,
+                prompt=prompt,
+                schema=schema,
+                pdf_bytes=chunk_pdf_bytes,
+                text = text,
                 engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
                 temperature=0.00,
             )
 
-            if i == 0:
-                from regex.fn_clean1 import clean
-                data1 = clean (master_schema=master_schema,data1=data1)
+            data = reorder_by_schema(data, schema)
+            print(json.dumps(data, ensure_ascii=False, indent=2))
 
-            if i == 1:
-                from regex.fn_clean2 import clean
-                data1 = clean (master_schema=master_schema,data1=data1)
+            out_dir = Path("data")
+            out_dir.mkdir(parents=True, exist_ok=True)
 
-            if i == 2:
-                from regex.fn_clean3 import clean
-                data1 = clean (master_schema=master_schema,data1=data1)
+            out_path = out_dir / "name.json"   # เปลี่ยนชื่อไฟล์ได้
+            with out_path.open("w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
 
-            if i == 3 :
-                from fn_chunk.fn_chunk4_1_2 import schema_prompt
-                schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-                data2 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                    engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-                    temperature=0.00,
-                )
-
-                from fn_chunk.fn_chunk4_2 import schema_prompt
-                schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-
-                start_page = start_chunk_page[i+1]
-                end_page = start_chunk_page[i+2]
-                chunk_pdf_bytes = slice_pdf_pages(
-                    pdf_bytes=pdf_bytes,
-                    start_page=start_page,
-                    end_page=end_page
-                )
-
-                data3 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                    engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-                    temperature=0.00,
-                )
-
-                from regex.fn_clean4 import clean
-                data1 = clean (master_schema=master_schema,data1=data1,data2=data2,data3=data3)
-
-            if i == 5 :
-                from fn_chunk.fn_chunk5_1_2 import schema_prompt
-                schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-                text = text_with_tables(chunk_pdf_bytes)
-                chunk_pdf_bytes2 = None
-                data2 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes2,text = text,
-                    engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-                    temperature=0.00,
-                )
-                text=None
-
-                from fn_chunk.fn_chunk5_1_3 import schema_prompt
-                schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-                data3 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                    engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-                    temperature=0.00,
-                )
-
-                from regex.fn_clean5 import clean
-                data1 = clean (master_schema=master_schema,data1=data1,data2=data2,data3=data3)
-
-            if i == 6 :
-                from fn_chunk.fn_chunk6_1_2 import schema_prompt
-                schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-                data2 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                    engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
-                    temperature=0.00,
-                )
-
-                from regex.fn_clean6 import clean
-                data1 = clean (master_schema=master_schema,data1=data1,data2=data2)
-
-            if i == 7:
-                from regex.fn_clean7 import clean
-                data1 = clean (master_schema=master_schema,data1=data1)
-
-            if i == 8:
-                from regex.fn_clean8 import clean
-                data1 = clean (master_schema=master_schema,data1=data1)
-
-            if i == 9:
-                from regex.fn_clean9 import clean
-                data1 = clean (master_schema=master_schema,data1=data1)
-
-            print("<data before reoreder>",data1)
-
-            data1 = reorder_by_schema(data1, master_schema)
-            print("<data after reorder>")
-            print(json.dumps(data1, ensure_ascii=False, indent=2))
-            print("done")
-
+            print("[OK] wrote:", out_path.resolve())
 
 finally:
     close_log()

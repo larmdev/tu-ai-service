@@ -1,10 +1,8 @@
 import re
 import unicodedata
 
-
-
-from fn_add_field_lost import add_field_lost
-from fn_clean import clean_all
+from .fn_add_field_lost import add_field_lost
+from regex.fn_clean_all import clean_all
 def clean (master_schema,data1,data2,data3 ):
 
 

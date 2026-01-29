@@ -12,6 +12,7 @@ from function.fn_slice_page_pdf import slice_pdf_pages
 from function.fn_pdf_to_byte import to_pdf_bytes
 from function.fn_chunk_number import locate_chunks
 from function.fn_pdf_from_url import load_pdf_from_url
+from function.fn_pdf_text_table import text_with_tables
 
 
 
@@ -34,86 +35,148 @@ class ChunkRequest(BaseModel):
 async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId, fileName, start_chunk_page):
     try:
 
-        # กำหนด schema & prompt
         if chunk_idx == 4 :
-            return "ppp"
-
-        schema, prompt = None, None
-        if chunk_idx == 0:
-            from fn_chunk.fn_chunk1 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 1:
-            from fn_chunk.fn_chunk2 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 2:
-            from fn_chunk.fn_chunk3 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 3:
-            from fn_chunk.fn_chunk4_2 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 5:
-            # กลับมาเริ่ม fn_chunk5 ตามที่คุณต้องการ
-            from fn_chunk.fn_chunk5 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 6:
-            from fn_chunk.fn_chunk6 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 7:
-            from fn_chunk.fn_chunk7 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 8:
-            from fn_chunk.fn_chunk8 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        elif chunk_idx == 9:
-            from fn_chunk.fn_chunk9 import schema_prompt
-            schema, prompt = schema_prompt()
-
-        # ตัด PDF
+            return "chunk 4"
+        start_page = start_chunk_page[chunk_idx]
+        end_page = start_chunk_page[chunk_idx + 1]
+        
+        if start_page is None or end_page is None :
+            return "no start/end page"
         chunk_pdf_bytes = slice_pdf_pages(
             pdf_bytes=pdf_bytes,
             start_page=start_page,
             end_page=end_page
         )
 
-        # extract data
-        data = call_openrouter_pdf(
-            api_key=OPEN_ROUTER_KEY,
-            model=MODEL,
-            prompt=prompt,
-            schema=schema,
-            pdf_bytes=chunk_pdf_bytes,
-            engine="pdf-text",
+        text = None
+
+        if chunk_idx == 0 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 1 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk2 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 2 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk3 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 3 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk4_1_1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 5 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk5_1_1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+            # text = text_with_tables(chunk_pdf_bytes)
+            # chunk_pdf_bytes = None
+
+        elif chunk_idx == 6 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk6_1_1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 7 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk7 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 8 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk8 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 9 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk9 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        data1 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+            engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
             temperature=0.00,
         )
 
-        # if chunk_idx == 3:
-        #     from fn_chunk4_2 import schema_prompt
-        #     schema, prompt = schema_prompt()
-        #     chunk_pdf_bytes = slice_pdf_pages(
-        #         pdf_bytes=pdf_bytes,
-        #         start_page=start_chunk_page[4],
-        #         end_page=start_chunk_page[5]
-        #     )
-        #     data2 = call_openrouter_pdf(
-        #         api_key=OPEN_ROUTER_KEY,
-        #         model=MODEL,
-        #         prompt=prompt,
-        #         schema=schema,
-        #         pdf_bytes=chunk_pdf_bytes,
-        #         engine="pdf-text",
-        #         temperature=0.00,
-        #     )
+        if chunk_idx == 0:
+            from regex.fn_clean1 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
 
+        if chunk_idx == 1:
+            from regex.fn_clean2 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
 
-        ####### regex 1-9
+        if chunk_idx == 2:
+            from regex.fn_clean3 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 3 :
+            from fn_chunk.fn_chunk4_1_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            data2 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from fn_chunk.fn_chunk4_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+            start_page = start_chunk_page[i+1]
+            end_page = start_chunk_page[i+2]
+            chunk_pdf_bytes = slice_pdf_pages(
+                pdf_bytes=pdf_bytes,
+                start_page=start_page,
+                end_page=end_page
+            )
+
+            data3 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from regex.fn_clean4 import clean
+            data1 = clean (master_schema=master_schema,data1=data1,data2=data2,data3=data3)
+
+        if chunk_idx == 5 :
+            from fn_chunk.fn_chunk5_1_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            text = text_with_tables(chunk_pdf_bytes)
+            chunk_pdf_bytes2 = None
+            data2 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes2,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+            text=None
+
+            from fn_chunk.fn_chunk5_1_3 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            data3 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from regex.fn_clean5 import clean
+            data1 = clean (master_schema=master_schema,data1=data1,data2=data2,data3=data3)
+
+        if chunk_idx == 6 :
+            from fn_chunk.fn_chunk6_1_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            data2 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from regex.fn_clean6 import clean
+            data1 = clean (master_schema=master_schema,data1=data1,data2=data2)
+
+        if chunk_idx == 7:
+            from regex.fn_clean7 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 8:
+            from regex.fn_clean8 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 9:
+            from regex.fn_clean9 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
         
         if chunk_idx >= 4 :
             plusnum = 0
@@ -126,7 +189,7 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             "refId": refId,
             "fileName": fileName,
             "chunk": f"chunk{section}",
-            "data": data
+            "data": data1
         }
 
         # ยิง Callback

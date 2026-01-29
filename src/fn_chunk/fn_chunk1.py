@@ -5,7 +5,7 @@ def schema_prompt(chunk_pdf_bytes: bytes | None = None):
 
 curriculumId Null
 
-approvalStatus ให้เป็น
+approvalStatus ให้เป็น "in-progress" เท่านั้น
 institutionName ให้ค่าเป็น "มหาวิทยาลัยธรรมศาสตร์"
 
 facultyName คณะ/วิทยาลัย/สถาบัน (หากมี ศูนย์อยู่ด้านหลัง ไม่ต้องเอารายละเอียดศูนย์)

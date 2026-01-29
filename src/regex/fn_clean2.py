@@ -1,7 +1,8 @@
-from fn_add_field_lost import add_field_lost
-from fn_clean import clean_all
+from .fn_add_field_lost import add_field_lost
+from regex.fn_clean_all import clean_all
 def clean (master_schema,data1 ):
 
+    print("before",data1)
     students_per_year = data1.get("studentsPerYear")
 
     plans = data1.get("studentAdmissionPlans")
@@ -42,7 +43,6 @@ def clean (master_schema,data1 ):
 
             if "head_studentAdmissionPlans" in plan:
                 del plan["head_studentAdmissionPlans"]
-
 
     data1 = add_field_lost(master_schema=master_schema,data1=data1)
     
