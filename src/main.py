@@ -272,7 +272,7 @@ async def process_single_chunk(
         }
 
         print(f"Callback URL: {CALLBACK_URL}/g{section}")
-        print(payload)
+        # print(payload)
         # ยิง Callback
         async with httpx.AsyncClient() as client:
             resp = await client.post(
@@ -367,5 +367,5 @@ async def msg():
 
 
 @app.get("/api/msg1")
-async def msg():
+async def msg1():
     return {"status": 200, "message": "API is running. 1"}
