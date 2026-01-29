@@ -7,7 +7,6 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: tu-ai-service
-  AZURE_RESOURCE_GROUP: tu   # ใช้สำหรับ restart
 
 jobs:
   build-and-deploy:
@@ -19,36 +18,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # (Optional) แสดง commit hash เพื่อ debug ว่า deploy version ไหน
-    - name: Show Git Commit
-      run: |
-        echo "Deploying commit:"
-        git rev-parse HEAD
-
-    # Zip โค้ดทั้งหมด เพื่อกัน Azure ใช้ cache เก่า
-    - name: Zip application package
-      run: |
-        zip -r app.zip . -x "*.git*" -x "*__pycache__*" -x "*.venv*"
-
-    # Deploy zip ไป Azure
-    - name: Deploy to Azure Web App
+    - name: Deploy to Azure Web App (Python - no registry)
       uses: azure/webapps-deploy@v2
       id: deploy
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: app.zip
+        package: .
 
-    # Force restart เพื่อ kill worker เก่า
-    - name: Restart Azure Web App
-      uses: azure/cli@v2
-      with:
-        inlineScript: |
-          az webapp restart \
-            --name ${{ env.AZURE_WEBAPP_NAME }} \
-            --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
-
-    - name: Done
+    - name: Get deployment URL
       run: |
-        echo "Deployment completed!"
+        echo "Deployment successful!"
         echo "App URL: https://tu-ai-service-a5fnave5fqg0bzb5.southeastasia-01.azurewebsites.net"
