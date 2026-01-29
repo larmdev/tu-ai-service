@@ -10,6 +10,8 @@ def _norm_thai(text: str) -> str:
         return ""
     t = unicodedata.normalize("NFC", text)
     t = t.replace("ํา", "ำ").replace("าํ", "ำ")
+    t = t.replace("ํา", "ำ").replace("าํ", "ำ")
+    t = t.replace(" า", "ำ")
     t = t.replace("\u200b", "").replace("\ufeff", "")
     t = t.replace(" ", "")
     t = re.sub(r"\s+", " ", t).strip()

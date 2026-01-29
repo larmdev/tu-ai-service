@@ -10,7 +10,7 @@ import re
 import json
 import requests
 
-from fn_chunk_number import locate_chunks
+from function.fn_chunk_number import locate_chunks
 pdf_url = "https://drive.google.com/file/d/1Xlsqq3uIACYUSGZYfpewhW33DtjgKc4U/edit"
 
 def _drive_to_direct_download(url: str) -> str:
