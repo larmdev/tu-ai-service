@@ -29,6 +29,5 @@ jobs:
     
     - name: Get deployment URL
       run: |
-          az webapp restart \
-          --name ${{ env.AZURE_WEBAPP_NAME }} \
-          --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+        echo "Deployment successful!"
+        echo "App URL: https://tu-ai-service-a5fnave5fqg0bzb5.southeastasia-01.azurewebsites.net"
