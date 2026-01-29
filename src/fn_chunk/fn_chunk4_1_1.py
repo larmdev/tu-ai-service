@@ -3,7 +3,7 @@ def schema_prompt(chunk_pdf_bytes: bytes = None):
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
 ข้อมูลจากหมวดที่ 4
 
-curriculumId
+curriculumId เป็น null
 
 จากหัวข้อ ระบบการจัดการศึกษาและระยะเวลาการศึกษา
 educationSystem ระบบ (เอามาทั้งหมดในหัวข้อย่อย ระบบ)

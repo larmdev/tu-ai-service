@@ -3,7 +3,7 @@ def schema_prompt(chunk_pdf_bytes: bytes | None = None):
     prompt = """เรียงจากบนลงล่าง ห้ามตอบคำอธิบายอื่น ให้ตอบเป็น JSON อย่างเดียว ตาม schema ที่กำหนด
 ข้อมูลจากหมวดที่ 1
 
-curriculumId Null
+curriculumId เป็น null
 
 approvalStatus ให้เป็น "open-admission" เท่านั้น
 institutionName ให้ค่าเป็น "มหาวิทยาลัยธรรมศาสตร์"
