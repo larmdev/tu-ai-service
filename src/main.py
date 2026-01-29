@@ -117,8 +117,8 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             from fn_chunk.fn_chunk4_2 import schema_prompt
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
-            start_page = start_chunk_page[i+1]
-            end_page = start_chunk_page[i+2]
+            start_page = start_chunk_page[chunk_idx+1]
+            end_page = start_chunk_page[chunk_idx+2]
             chunk_pdf_bytes = slice_pdf_pages(
                 pdf_bytes=pdf_bytes,
                 start_page=start_page,
