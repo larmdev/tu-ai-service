@@ -193,6 +193,7 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
         }
 
         print(f"Callback URL: {CALLBACK_URL}/g{section}")
+        print(payload)
         # ยิง Callback
         async with httpx.AsyncClient() as client:
             resp = await client.post(f"{CALLBACK_URL}/g{section}", json=payload, timeout=60.0)
