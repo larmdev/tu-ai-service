@@ -58,12 +58,12 @@ curriculumStructures
             },
             "curriculumStudySystem": {
                 "type": ["string", "null"],
-                "enum": ["ONSITE" ,"ONLINE" ,"HYBRID"],
+                "enum": ["onsite", "online", "hybrid"],
                 },
             "curriculumStudySystemOther": {"type": ["string", "null"]},
             "transferCurriculumLevel": {
                 "type": ["string", "null"],
-                "enum": ["BACHELOR" ,"MASTER" ,"DOCTOR"],},
+                "enum": ["bachelor", "master", "doctor"],},
             "transferAcademicYear": {"type": ["string", "null"]},
             "curriculumTotalCredits": {"type": ["integer", "null"]},
             "minimumCurriculumCredits": {"type": ["integer", "null"]},
@@ -159,6 +159,8 @@ curriculumStructures
                         "credits": {"type": ["integer", "null"]},
                         "lecturePracticeSelfStudy": {"type": ["string", "null"]},
                         "courseGroup": {"type": ["string", "null"]},
+                        "subCourseGroup": {"type": ["string", "null"]},
+                        "level": {"type": ["integer", "null"]},
                         "semester": {"type": ["integer", "null"]},
                         "academicYear": {"type": ["integer", "null"]},
                     },
