@@ -333,10 +333,10 @@ async def background_manager(body: ChunkRequest, pdf_bytes: bytes):
 #     return {"status": 200, "message": "Success. Processing started in background."}
 
 
-def background_manager_with_download(body: ChunkRequest):
+async def background_manager_with_download(body: ChunkRequest):
     try:
         pdf_bytes = load_pdf_from_url(body.url)
-        background_manager(body, pdf_bytes)
+        await background_manager(body, pdf_bytes)
     except Exception as e:
         # log error
         print(f"Background error: {e}")
