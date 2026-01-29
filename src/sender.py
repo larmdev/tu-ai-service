@@ -8,11 +8,12 @@ API_URL = "http://localhost:8000/api/curriculum/local-save"
 # รายการไฟล์ PDF
 pdf_files = [
     # "https://drive.google.com/file/d/1Z1yqquXlgKTRaK7AEBGMV2fbxUqti3kO/edit",
-    "https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit",
+    # "https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit",
     # "https://drive.google.com/file/d/1I9qBUchBydejWwGgbkpC-IdZFvfg61G-/edit",
     # "https://drive.google.com/file/d/1BuRHEYFGX0uQRJaiAG_Wo8TLnuZfxIZa/edit",
     # "https://drive.google.com/file/d/1Z_0zWJQQCrjyEvivrt1lr4ys6FmfkMmO/edit",
-    # "https://drive.google.com/file/d/1gZf4ob2MscXVIodVEDe_Y5RhWfy02On9/view"
+    # "https://drive.google.com/file/d/1gZf4ob2MscXVIodVEDe_Y5RhWfy02On9/view",
+    "https://drive.google.com/file/d/15rvvktk9KYUdpHdic9Ra1THG3f7WGsg5/edit"
 ]
 
 def send_files():
