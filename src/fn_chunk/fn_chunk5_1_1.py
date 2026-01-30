@@ -201,6 +201,9 @@ ploTeachingAssessment (เป็นตารางที่มี 3 column 'ผ�
                                 "properties": {
                                     "subCourseGroup": {"type": ["string", "null"]},
                                     "credits": {"type": ["integer", "null"]},
+                                    "lecture": {"type": ["integer"]},
+                                    "practice": {"type": ["integer"]},
+                                    "selfStudy": {"type": ["integer"]},
                                     "yearLevel": {"type": ["integer", "null"]},
                                     "plos": {
                                         "type": ["object", "null"],
