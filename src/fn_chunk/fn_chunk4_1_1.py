@@ -30,10 +30,10 @@ minimumCurriculumCredits จำนวนหน่วยกิต ที่ต้
 curriculumStructures
   sequence null
   courseGroup หมวดวิชาใหญ่
-  courseCredits จำนวนหน่วยกิตของ หมวดวิชาใหญ่
+  courseCredits จำนวนหน่วยกิตของ หมวดวิชาใหญ่ แปลงให้เป็นข้อมูล string เท่านั้น ห้ามเป็น integer
   subCourseGroups (จะลงรายละเอียดไปอีกแค่ หนึ่งขั้น ถ้ามีการลงรายละเอียดอีกจะไม่นับ)
     subCourseGroup หมวดวิชาย่อย
-    credits จำนวนหน่วยกิตของ หมวดวิชาใหญ่
+    credits จำนวนหน่วยกิตของ หมวดวิชาใหญ่ แปลงให้เป็นข้อมูล string เท่านั้น ห้ามเป็น integer
     """
 
     schema = {
@@ -73,14 +73,14 @@ curriculumStructures
                     "properties": {
                         "sequence": {"type": "integer"},
                         "courseGroup": {"type": "string"},
-                        "courseCredits": {"type": "integer"},
+                        "courseCredits": {"type": "string"},
                         "subCourseGroups": {
                             "type": ["array", "null"],
                             "items": {
                                 "type": "object",
                                 "properties": {
                                     "subCourseGroup": {"type": "string"},
-                                    "credits": {"type": "integer"},
+                                    "credits": {"type": "string"},
                                 },
                                 "required": ["subCourseGroup", "credits"],
                             },
@@ -126,14 +126,14 @@ curriculumStructures
                     "properties": {
                         "sequence": {"type": "integer"},
                         "courseGroup": {"type": "string"},
-                        "courseCredits": {"type": "integer"},
+                        "courseCredits": {"type": "string"},
                         "subCourseGroups": {
                             "type": ["array", "null"],
                             "items": {
                                 "type": "object",
                                 "properties": {
                                     "subCourseGroup": {"type": "string"},
-                                    "credits": {"type": "integer"},
+                                    "credits": {"type": "string"},
                                 },
                                 "required": ["subCourseGroup", "credits"],
                             },
@@ -154,7 +154,7 @@ curriculumStructures
                         "courseNameEn": {"type": ["string", "null"]},
                         "courseDescriptionTh": {"type": ["string", "null"]},
                         "courseDescriptionEn": {"type": ["string", "null"]},
-                        "credits": {"type": ["integer", "null"]},
+                        "credits": {"type": ["string", "null"]},
                         "lecturePracticeSelfStudy": {"type": ["string", "null"]},
                         "courseGroup": {"type": ["string", "null"]},
                         "subCourseGroup": {"type": ["string", "null"]},

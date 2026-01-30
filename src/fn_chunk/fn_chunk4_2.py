@@ -9,7 +9,7 @@ courses
         sequence null
         courseCodeTh รหัสวิชาภาษาไทย
         courseNameTh ชื่อวิชาภาษาไทยเต็ม
-        credits หน่วยกิต (จะเป็นเลขเดี่ยวๆ)
+        credits หน่วยกิต (จะเป็นเลขเดี่ยวๆ แปลงข้อมูลเป็น string เท่านั้น)
         lecturePracticeSelfStudy รายละเอียดหน่วยกิต (จะเป็นข้อความทั้งหมดในวงเล็บหลังหน่วยกิตเช่น 2-2-5 หรือ 500ชั่วโมง)
         courseCodeEn รหัสวิชาภาษาอังกฤษ
         courseNameEn ชื่อวิชาภาษาอังกฤษเต็ม
@@ -34,7 +34,7 @@ courses
                                     "sequence": {"type": "null"},
                                     "courseCodeTh": {"type": ["string", "null"]},
                                     "courseNameTh": {"type": ["string", "null"]},
-                                    "credits": {"type": ["integer", "null"]},
+                                    "credits": {"type": ["string", "null"]},
                                     "lecturePracticeSelfStudy": {"type": ["string", "null"]},
                                     "courseCodeEn": {"type": ["string", "null"]},
                                     "courseNameEn": {"type": ["string", "null"]},
