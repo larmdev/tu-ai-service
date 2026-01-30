@@ -3,8 +3,9 @@ import unicodedata
 
 from .fn_add_field_lost import add_field_lost
 from regex.fn_clean_all import clean_all
-def clean (master_schema,data1,data2,data3 ):
 
+
+def clean(master_schema, data1, data2, data3):
 
     # -----------------------------
     # Helpers (เป็นตัวแปร/ฟังก์ชันเล็ก ๆ ในสคริปต์เดียว)
@@ -12,6 +13,9 @@ def clean (master_schema,data1,data2,data3 ):
 
     def strip_dot_space(s: str) -> str:
         return re.sub(r"[.\s]+", "", s)
+
+    def strip_space_only(s: str) -> str:
+        return re.sub(r"\s+", "", s)
 
     def normalize_en_for_match(s: str) -> str:
         # uppercase + remove spaces
@@ -65,7 +69,7 @@ def clean (master_schema,data1,data2,data3 ):
                 # clean code in data (in-place ใน row; และถ้าคุณต้องการแก้ใน data2 ด้วยจริง ๆ ต้องไล่แก้ต้นฉบับ แต่คุณบอก "แก้ใน data เลย"
                 # ดังนั้นเราจะ clean แล้วเขียนกลับลง d ด้วย
                 if isinstance(d.get("courseCodeTh"), str):
-                    d["courseCodeTh"] = strip_dot_space(d["courseCodeTh"])
+                    d["courseCodeTh"] = strip_space_only(d["courseCodeTh"])
                     row["courseCodeTh"] = d["courseCodeTh"]
                 if isinstance(d.get("courseCodeEn"), str):
                     d["courseCodeEn"] = strip_dot_space(d["courseCodeEn"]).upper()
@@ -92,7 +96,7 @@ def clean (master_schema,data1,data2,data3 ):
 
                 # clean code in data3 ด้วย
                 if isinstance(d.get("courseCodeTh"), str):
-                    d["courseCodeTh"] = strip_dot_space(d["courseCodeTh"])
+                    d["courseCodeTh"] = strip_space_only(d["courseCodeTh"])
                     row["courseCodeTh"] = d["courseCodeTh"]
                 if isinstance(d.get("courseCodeEn"), str):
                     d["courseCodeEn"] = strip_dot_space(d["courseCodeEn"]).upper()
@@ -150,7 +154,9 @@ def clean (master_schema,data1,data2,data3 ):
             # เติม nulls ใน flat2[j] ด้วยค่าจาก c
             fill_nulls(flat2[j], c)
             # ถ้า courseGroup ใน flat2 ไม่มี แต่ c มี -> เติม
-            if (flat2[j].get("courseGroup") is None) and (c.get("courseGroup") is not None):
+            if (flat2[j].get("courseGroup") is None) and (
+                c.get("courseGroup") is not None
+            ):
                 flat2[j]["courseGroup"] = c.get("courseGroup")
         else:
             # ไม่เจอใน flat2 -> add เข้า all_course
@@ -193,7 +199,10 @@ def clean (master_schema,data1,data2,data3 ):
             code_th = c.get("courseCodeTh")
             if isinstance(code_th, str) and code_th:
                 # normalize แบบไทยให้เทียบได้ (code_th ปกติเป็น latin/ตัวเลข ก็ไม่เสียหาย)
-                if normalize_th_for_match(code_th) and normalize_th_for_match(code_th) in target:
+                if (
+                    normalize_th_for_match(code_th)
+                    and normalize_th_for_match(code_th) in target
+                ):
                     return i
 
         # 2) name_th in courseTh
@@ -240,7 +249,11 @@ def clean (master_schema,data1,data2,data3 ):
                     "academicYear": academic_year,
                 }
 
-                mi = match_all_course_to_courseTh(course_th) if isinstance(course_th, str) else None
+                mi = (
+                    match_all_course_to_courseTh(course_th)
+                    if isinstance(course_th, str)
+                    else None
+                )
                 if mi is not None:
                     c = all_course[mi]
                     used_all_course_idx.add(mi)
@@ -258,8 +271,13 @@ def clean (master_schema,data1,data2,data3 ):
                     # ถ้า structure ไม่มี แต่ all_course มี -> เติม
                     if row["credits"] is None and c.get("credits") is not None:
                         row["credits"] = c.get("credits")
-                    if row["lecturePracticeSelfStudy"] is None and c.get("lecturePracticeSelfStudy") is not None:
-                        row["lecturePracticeSelfStudy"] = c.get("lecturePracticeSelfStudy")
+                    if (
+                        row["lecturePracticeSelfStudy"] is None
+                        and c.get("lecturePracticeSelfStudy") is not None
+                    ):
+                        row["lecturePracticeSelfStudy"] = c.get(
+                            "lecturePracticeSelfStudy"
+                        )
                 else:
                     # unmapped จาก all_course -> ใช้ fallback ตามที่คุณบอก
                     row["courseNameTh"] = course_th
@@ -271,27 +289,28 @@ def clean (master_schema,data1,data2,data3 ):
 
                 master_courses.append(row)
 
-
     APPEND_UNMAPPED_ALL_COURSE = True  # เปลี่ยนเป็น True ถ้าต้องการ
 
     if APPEND_UNMAPPED_ALL_COURSE:
         for i, c in enumerate(all_course):
             if i in used_all_course_idx:
                 continue
-            master_courses.append({
-                "sequence": None,
-                "courseCodeTh": c.get("courseCodeTh"),
-                "courseCodeEn": c.get("courseCodeEn"),
-                "courseNameTh": c.get("courseNameTh"),
-                "courseNameEn": c.get("courseNameEn"),
-                "courseDescriptionTh": c.get("courseDescriptionTh"),
-                "courseDescriptionEn": c.get("courseDescriptionEn"),
-                "credits": c.get("credits"),
-                "lecturePracticeSelfStudy": c.get("lecturePracticeSelfStudy"),
-                "courseGroup": c.get("courseGroup"),
-                "semester": None,
-                "academicYear": None,
-            })
+            master_courses.append(
+                {
+                    "sequence": None,
+                    "courseCodeTh": c.get("courseCodeTh"),
+                    "courseCodeEn": c.get("courseCodeEn"),
+                    "courseNameTh": c.get("courseNameTh"),
+                    "courseNameEn": c.get("courseNameEn"),
+                    "courseDescriptionTh": c.get("courseDescriptionTh"),
+                    "courseDescriptionEn": c.get("courseDescriptionEn"),
+                    "credits": c.get("credits"),
+                    "lecturePracticeSelfStudy": c.get("lecturePracticeSelfStudy"),
+                    "courseGroup": c.get("courseGroup"),
+                    "semester": None,
+                    "academicYear": None,
+                }
+            )
 
     data1["courses"] = master_courses
 
@@ -306,9 +325,8 @@ def clean (master_schema,data1,data2,data3 ):
     if "structure" in data1:
         del data1["structure"]
 
+    data1 = add_field_lost(master_schema=master_schema, data1=data1)
 
-    data1 = add_field_lost(master_schema=master_schema,data1=data1)
-    
     list_un_space = []
-    data1 = clean_all(list_un_space=list_un_space,data1=data1)
+    data1 = clean_all(list_un_space=list_un_space, data1=data1)
     return data1
