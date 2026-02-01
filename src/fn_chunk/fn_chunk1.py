@@ -9,8 +9,38 @@ approvalStatus ให้เป็น "in-progress" เท่านั้น
 institutionName ให้ค่าเป็น "มหาวิทยาลัยธรรมศาสตร์"
 
 facultyName คณะ/วิทยาลัย/สถาบัน (หากมี ศูนย์อยู่ด้านหลัง ไม่ต้องเอารายละเอียดศูนย์)
-facultyCode Null
-
+facultyCode คือ code หาก คณะ/วิทยาลัย/สถาบัน มีชื่อที่ตรงกันมากที่สุดให้ code ตามข้อมูลที่ระบุไว้
+[
+  { "no": 1, "code": "law", "nameTh": "คณะนิติศาสตร์", "nameEn": "Law" },
+  { "no": 2, "code": "tbs", "nameTh": "คณะพาณิชยศาสตร์และการบัญชี", "nameEn": "Business" },
+  { "no": 3, "code": "polsci", "nameTh": "คณะรัฐศาสตร์", "nameEn": "Political Science" },
+  { "no": 4, "code": "econ", "nameTh": "คณะเศรษฐศาสตร์", "nameEn": "Economics" },
+  { "no": 5, "code": "sw", "nameTh": "คณะสังคมสงเคราะห์ศาสตร์", "nameEn": "Social Work" },
+  { "no": 6, "code": "larts", "nameTh": "คณะศิลปศาสตร์", "nameEn": "Liberal Arts" },
+  { "no": 7, "code": "jc", "nameTh": "คณะวารสารศาสตร์และสื่อสารมวลชน", "nameEn": "Journalism and Mass Communication" },
+  { "no": 8, "code": "socanth", "nameTh": "คณะสังคมวิทยาและมานุษยวิทยา", "nameEn": "Sociology and Anthropology" },
+  { "no": 9, "code": "scitu", "nameTh": "คณะวิทยาศาสตร์และเทคโนโลยี", "nameEn": "Science and Technology" },
+  { "no": 10, "code": "tse", "nameTh": "คณะวิศวกรรมศาสตร์", "nameEn": "Engineering" },
+  { "no": 11, "code": "md", "nameTh": "คณะแพทยศาสตร์", "nameEn": "Medicine" },
+  { "no": 12, "code": "ahs", "nameTh": "คณะสหเวชศาสตร์", "nameEn": "Allied Health Sciences" },
+  { "no": 13, "code": "dental", "nameTh": "คณะทันตแพทยศาสตร์", "nameEn": "Dentistry" },
+  { "no": 14, "code": "ns", "nameTh": "คณะพยาบาลศาสตร์", "nameEn": "Nursing" },
+  { "no": 15, "code": "fatu", "nameTh": "คณะศิลปกรรมศาสตร์", "nameEn": "Fine and Applied Arts" },
+  { "no": 16, "code": "tds", "nameTh": "คณะสถาปัตยกรรมศาสตร์และการผังเมือง", "nameEn": "Architecture + Design" },
+  { "no": 17, "code": "phtu", "nameTh": "คณะสาธารณสุขศาสตร์", "nameEn": "Public Health" },
+  { "no": 18, "code": "pharm", "nameTh": "คณะเภสัชศาสตร์", "nameEn": "Pharmacy" },
+  { "no": 19, "code": "lsed", "nameTh": "คณะวิทยาการเรียนรู้และศึกษาศาสตร์", "nameEn": "Learning Science and Education" },
+  { "no": 21, "code": "litu", "nameTh": "สถาบันภาษา", "nameEn": "Language Institute" },
+  { "no": 22, "code": "siit", "nameTh": "สถาบันเทคโนโลยีนานาชาติสิรินธร", "nameEn": "Sirindhorn International Institute of Technology" },
+  { "no": 23, "code": "citu", "nameTh": "วิทยาลัยนวัตกรรม", "nameEn": "College of Innovation" },
+  { "no": 24, "code": "cistu", "nameTh": "วิทยาลัยสหวิทยาการ", "nameEn": "College of Interdisciplinary Studies" },
+  { "no": 27, "code": "pbic", "nameTh": "วิทยาลัยนานาชาติปรีดี พนมยงค์", "nameEn": "Pridi Banomyong International College" },
+  { "no": 28, "code": "sgs", "nameTh": "วิทยาลัยนานาชาติศึกษาระดับโลก", "nameEn": "School of Global Studies" },
+  { "no": 29, "code": "cicm", "nameTh": "วิทยาลัยแพทยศาสตร์นานาชาติจุฬาภรณ์", "nameEn": "Chulabhorn International College of Medicine" },
+  { "no": 30, "code": "psds", "nameTh": "วิทยาลัยพัฒนศาสตร์ ป๋วย อึ๊งภากรณ์", "nameEn": "Puey Ungphakorn School of Development Studies" },
+  { "no": 31, "code": "tiara", "nameTh": "สถาบันเอเชียตะวันออกและอาเซียนศึกษา", "nameEn": "Institute of East Asian and ASEAN Studies" },
+  { "no": 33, "code": "tuxsa", "nameTh": "วิทยาลัยวิชาการและนวัตกรรมสังคมศาสตร์", "nameEn": "Thammasat University X School of Social Sciences and Analytics" }
+]
 
 อยู่ในหัวข้อ รหัสและชื่อหลักสูตร
 curriculumCodeTh รหัสหลักสูตร
