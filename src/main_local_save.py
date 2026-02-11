@@ -16,7 +16,8 @@ import sys
 from function.fn_gemini import call_openrouter_pdf
 from function.fn_slice_page_pdf import slice_pdf_pages
 from function.fn_chunk_number import locate_chunks
-from function.fn_reorder_data_by_schema import reorder_data_by_schema
+from function.fn_reorder_data_by_schema import reorder_by_schema
+from function.fn_pdf_text_table import text_with_tables
 
 
 # --- 1. ตั้งค่า Logger ---
@@ -122,21 +123,163 @@ def load_pdf_and_name(url: str):
 async def process_and_save_chunk(chunk_idx, start_page, end_page, pdf_bytes, fileName, start_chunk_page):
     section_str = chunk_idx
     try:
-        if chunk_idx ==4 :
-            return "skipppp this is chunk 4"
+        if chunk_idx == 4 :
+            return "chunk 4"
+        if chunk_idx != 0 :
+            return "non"
+        start_page = start_chunk_page[chunk_idx]
+        end_page = start_chunk_page[chunk_idx + 1]
+        
+        if start_page is None or end_page is None :
+            return "no start/end page"
+        chunk_pdf_bytes = slice_pdf_pages(
+            pdf_bytes=pdf_bytes,
+            start_page=start_page,
+            end_page=end_page
+        )
 
-        #########################################
+        text = None
+
+        if chunk_idx == 0 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 1 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk2 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 2 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk3 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 3 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk4_1_1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 5 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk5_1_1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+            # text = text_with_tables(chunk_pdf_bytes)
+            # chunk_pdf_bytes = None
+
+        elif chunk_idx == 6 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk6_1_1 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 7 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk7 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 8 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk8 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        elif chunk_idx == 9 and start_page is not None and end_page is not None:
+            from fn_chunk.fn_chunk9 import schema_prompt
+            schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+        data1 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+            engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+            temperature=0.00,
+        )
+
+        if chunk_idx == 0:
+            from regex.fn_clean1 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 1:
+            from regex.fn_clean2 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 2:
+            from regex.fn_clean3 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 3 :
+            from fn_chunk.fn_chunk4_1_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            data2 = call_openrouter_pdf(api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from fn_chunk.fn_chunk4_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+
+            start_page = start_chunk_page[chunk_idx+1]
+            end_page = start_chunk_page[chunk_idx+2]
+            chunk_pdf_bytes = slice_pdf_pages(
+                pdf_bytes=pdf_bytes,
+                start_page=start_page,
+                end_page=end_page
+            )
+
+            data3 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from regex.fn_clean4 import clean
+            data1 = clean (master_schema=master_schema,data1=data1,data2=data2,data3=data3)
+
+        if chunk_idx == 5 :
+            from fn_chunk.fn_chunk5_1_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            text = text_with_tables(chunk_pdf_bytes)
+            chunk_pdf_bytes2 = None
+            data2 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes2,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+            text=None
+
+            from fn_chunk.fn_chunk5_1_3 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            data3 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from regex.fn_clean5 import clean
+            data1 = clean (master_schema=master_schema,data1=data1,data2=data2,data3=data3)
+
+        if chunk_idx == 6 :
+            from fn_chunk.fn_chunk6_1_2 import schema_prompt
+            schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
+            data2 = await asyncio.to_thread(call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
+                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+                temperature=0.00,
+            )
+
+            from regex.fn_clean6 import clean
+            data1 = clean (master_schema=master_schema,data1=data1,data2=data2)
+
+        if chunk_idx == 7:
+            from regex.fn_clean7 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 8:
+            from regex.fn_clean8 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        if chunk_idx == 9:
+            from regex.fn_clean9 import clean
+            data1 = clean (master_schema=master_schema,data1=data1)
+
+        data=data1
 
         if data:
         # เรียกใช้ฟังก์ชันจัดเรียง (data จะถูกเรียง key ใหม่ตาม schema เป๊ะๆ)
             logger.info(data)
-            data = reorder_data_by_schema(data, master_schema)
+            data = reorder_by_schema(data, master_schema)
             logger.info(f"-------- reorder --------\n{data}")
 
         # Save File
         save_dir = os.path.join(TARGET_BASE_DIR, fileName)
         os.makedirs(save_dir, exist_ok=True)
-        if chunk_idx > 4 :
+        
+        if chunk_idx < 4 :
             section_str = str(section_str+1)
 
         file_path = os.path.join(save_dir, f"g{section_str}.json")

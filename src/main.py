@@ -13,6 +13,8 @@ from function.fn_pdf_to_byte import to_pdf_bytes
 from function.fn_chunk_number import locate_chunks
 from function.fn_pdf_from_url import load_pdf_from_url
 from function.fn_pdf_text_table import text_with_tables
+from function.fn_concat_pdf_bytes import concat_pdf_bytes
+from function.fn_find_fisrt_page_non_empty import find_first_page_non_empty
 
 
 
@@ -47,6 +49,11 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             start_page=start_page,
             end_page=end_page
         )
+        
+        if chunk_idx == 0:
+            number_first_have_text = find_first_page_non_empty(pdf_bytes=pdf_bytes)
+            chunk_pdf_bytes2 = slice_pdf_pages(pdf_bytes=pdf_bytes,start_page=number_first_have_text,end_page=number_first_have_text)
+            chunk_pdf_bytes = concat_pdf_bytes(chunk_pdf_bytes2,chunk_pdf_bytes)
 
         text = None
 
@@ -117,8 +124,8 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             from fn_chunk.fn_chunk4_2 import schema_prompt
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
-            start_page = start_chunk_page[i+1]
-            end_page = start_chunk_page[i+2]
+            start_page = start_chunk_page[chunk_idx+1]
+            end_page = start_chunk_page[chunk_idx+2]
             chunk_pdf_bytes = slice_pdf_pages(
                 pdf_bytes=pdf_bytes,
                 start_page=start_page,
