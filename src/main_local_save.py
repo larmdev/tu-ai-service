@@ -125,6 +125,8 @@ async def process_and_save_chunk(chunk_idx, start_page, end_page, pdf_bytes, fil
     try:
         if chunk_idx == 4 :
             return "chunk 4"
+        if chunk_idx != 0 :
+            return "non"
         start_page = start_chunk_page[chunk_idx]
         end_page = start_chunk_page[chunk_idx + 1]
         

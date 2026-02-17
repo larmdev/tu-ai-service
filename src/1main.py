@@ -16,171 +16,157 @@ from function.fn_gemini import call_openrouter_pdf   # <- sync function (request
 from function.fn_slice_page_pdf import slice_pdf_pages
 from function.fn_chunk_number import locate_chunks
 from function.fn_reorder_data_by_schema import reorder_by_schema
-from function.fn_pdf_text_table import text_with_tables
-
-# -------------------------
-# Logging
-# -------------------------
-LOG_DIR = "logs"
-os.makedirs(LOG_DIR, exist_ok=True)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(os.path.join(LOG_DIR, "app.log"), encoding="utf-8"),
-        logging.StreamHandler(sys.stdout),
-    ],
-)
-logger = logging.getLogger(__name__)
-
-# -------------------------
-# ENV
-# -------------------------
-OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
-MODEL = os.getenv("MODEL")
-
-DEFAULT_LOCAL_PATH = os.path.expanduser("~/Desktop/pimdej/curriculum_tu/data")
-TARGET_BASE_DIR = os.getenv("OUTPUT_DIR", DEFAULT_LOCAL_PATH)
-
-# -------------------------
-# FastAPI
-# -------------------------
-app = FastAPI()
-
-class ChunkRequest(BaseModel):
-    refId: str
-    url: str
-
-# -------------------------
-# Helpers
-# -------------------------
-def fix_utf8(text: str) -> str:
-    if not text:
-        return text
-    try:
-        return text.encode("latin-1").decode("utf-8")
-    except Exception:
-        return text
-
-def get_google_drive_direct_link(url: str) -> Tuple[str, Optional[str]]:
-    patterns = [
-        r"drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)",
-        r"drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)",
-    ]
-    file_id = None
-    for pattern in patterns:
-        match = re.search(pattern, url)
-        if match:
-            file_id = match.group(1)
-            break
-
-    if file_id:
-        return f"https://drive.google.com/uc?export=download&id={file_id}", file_id
-    return url, None
-
-def load_pdf_and_name(url: str) -> Tuple[bytes, str]:
-    logger.info(f"Start downloading: {url}")
-    direct_url, file_id = get_google_drive_direct_link(url)
-
-    response = requests.get(direct_url)
-    response.raise_for_status()
-
-    filename = None
-    if "content-disposition" in response.headers:
-        cd = response.headers["content-disposition"]
-        fname_match = re.search(r'filename="?([^"]+)"?', cd)
-        if fname_match:
-            filename = fname_match.group(1)
-        elif "filename*" in cd:
-            fname_match = re.search(r"filename\*=UTF-8''(.+)", cd)
-            if fname_match:
-                filename = urllib.parse.unquote(fname_match.group(1))
-
-    if not filename:
-        if file_id:
-            filename = f"gdrive_{file_id}"
-        else:
-            filename = url.split("/")[-1].split("?")[0] or "unknown_file"
-
-    filename = fix_utf8(filename)
-
-    # remove .pdf
-    folder_name = filename[:-4] if filename.lower().endswith(".pdf") else filename
-    folder_name = re.sub(r'[<>:"/\\|?*]', "_", folder_name)
-
-    logger.info(f"Download complete. Resolved Name: {folder_name}")
-    return response.content, folder_name
+from function.fn_concat_pdf_bytes import concat_pdf_bytes
+from function.fn_find_fisrt_page_non_empty import find_first_page_non_empty
+import os
+import json
 
 
-# -------------------------
-# ✅ Async Wrapper (IMPORTANT)
-# -------------------------
-async def call_openrouter_pdf_async(
-    semaphore: asyncio.Semaphore,
-    *,
-    api_key: str,
-    model: str,
-    prompt: str,
-    schema: Dict[str, Any],
-    pdf_bytes: Optional[bytes] = None,
-    text: Optional[str] = None,
-    engine: str = "pdf-text",
-    temperature: float = 0.0,
-    timeout: Optional[float] = None,
-) -> Dict[str, Any]:
+import sys
+import sys
+class _Tee:
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, data):
+        for s in self.streams:
+            s.write(data)
+            s.flush()
+
+    def flush(self):
+        for s in self.streams:
+            s.flush()
+
+def setup_logging_to_file(log_path: str = "1log_test.log", mode: str = "w", encoding: str = "utf-8"):
     """
-    call_openrouter_pdf เป็น sync (requests) -> ห้าม await ตรงๆ
-    ใช้ asyncio.to_thread + semaphore เพื่อให้ทำงานพร้อมกันแบบปลอดภัย
+    ทำให้ print() ยังออก terminal และถูกเขียนลงไฟล์ log พร้อมกัน
+    คืนค่าเป็นฟังก์ชัน close() เอาไว้เรียกตอนจบ
     """
-    async with semaphore:
-        return await asyncio.to_thread(
-            call_openrouter_pdf,
-            api_key=api_key,
-            model=model,
-            prompt=prompt,
-            schema=schema,
-            pdf_bytes=pdf_bytes,
-            text=text,
-            engine=engine,
-            temperature=temperature,
-            timeout=timeout,
-        )
+    log_file = open(log_path, mode, encoding=encoding)
+
+    # เก็บของเดิมไว้ เผื่อ restore
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+
+    sys.stdout = _Tee(sys.__stdout__, log_file)
+    sys.stderr = _Tee(sys.__stderr__, log_file)
+
+    def close():
+        # restore กลับเหมือนเดิม + ปิดไฟล์
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+        log_file.close()
+
+    return close
 
 
-# -------------------------
-# Chunk Worker
-# -------------------------
-async def process_and_save_chunk(
-    *,
-    chunk_idx: int,
-    pdf_bytes: bytes,
-    fileName: str,
-    start_chunk_page: List[Optional[int]],
-    semaphore: asyncio.Semaphore,
-):
-    section_str = str(chunk_idx)
 
-    try:
-        # ถ้าคุณอยาก skip chunk 4 เหมือนเดิม
-        if chunk_idx == 4:
-            logger.info(f"[{fileName}] skip chunk 4")
-            return
+#####
+from dotenv import load_dotenv
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
+import io
+import re
+from typing import Any, Dict
+from pathlib import Path
+from done.read_text import extract_page_text_as_debug_string
+list_pdf = [
+    "https://drive.google.com/file/d/1Z1yqquXlgKTRaK7AEBGMV2fbxUqti3kO/edit",
+    # "https://drive.google.com/file/d/1EnjPZeeDrSA8ihlqJfHVhAg84uwkXQ2k/edit",
+    # "https://drive.google.com/file/d/1I9qBUchBydejWwGgbkpC-IdZFvfg61G-/edit",
+    # "https://drive.google.com/file/d/1BuRHEYFGX0uQRJaiAG_Wo8TLnuZfxIZa/edit",
+    # "https://drive.google.com/file/d/1Z_0zWJQQCrjyEvivrt1lr4ys6FmfkMmO/edit",
+    # "https://drive.google.com/file/d/1gZf4ob2MscXVIodVEDe_Y5RhWfy02On9/view"   
+]
+close_log = setup_logging_to_file("1log_test.log", mode="w")  # "a" ต่อท้าย, "w" ทับไฟล์เดิม
 
-        start_page = start_chunk_page[chunk_idx]
-        end_page = start_chunk_page[chunk_idx + 1]
+try:
 
-        if start_page is None or end_page is None:
-            logger.warning(f"[{fileName}] chunk {chunk_idx} has no start/end page")
-            return
+    load_dotenv()
+    OPEN_ROUTER_KEY = os.getenv("OPEN_ROUTER_KEY")
+    print(OPEN_ROUTER_KEY)
+    MODEL = os.getenv("MODEL")
 
-        chunk_pdf_bytes = slice_pdf_pages(
-            pdf_bytes=pdf_bytes,
-            start_page=start_page,
-            end_page=end_page,
-        )
+    drive_url = os.getenv("DRIVE_URL")
+    script_dir = Path(__file__).resolve().parent
 
-        text = None
+    # 2. ถอยหลัง 1 ชั้นเพื่อไปหาโฟลเดอร์หลัก (จะได้ .../curriculum_tu)
+    # หมายเหตุ: .parent 1 ครั้ง เพราะไฟล์อยู่ใน src (1 ชั้นจาก root)
+    project_root = script_dir.parent 
+
+    # 3. รวม path เข้ากับชื่อไฟล์
+    sa_path = project_root / "service_account.json"
+    SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
+    creds = service_account.Credentials.from_service_account_file(str(sa_path), scopes=SCOPES)
+    drive = build("drive", "v3", credentials=creds, cache_discovery=False)
+
+    def _extract_file_id_from_drive_url(url: str) -> str:
+        # รองรับ /file/d/<id> และ ?id=<id>
+        m = re.search(r"/file/d/([a-zA-Z0-9_-]+)", url)
+        if m:
+            return m.group(1)
+        m = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", url)
+        if m:
+            return m.group(1)
+        raise ValueError(f"Cannot parse file_id from url: {url}")
+
+
+    def download_drive_pdf_bytes(drive, file_id: str) -> bytes:
+        request = drive.files().get_media(fileId=file_id, supportsAllDrives=True)
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+        return fh.getvalue()
+    #####
+
+
+
+    for i in list_pdf:
+        PDF_URL = i
+        print(f"PDF: {i}")
+        file_id = _extract_file_id_from_drive_url(PDF_URL)
+        pdf_bytes = download_drive_pdf_bytes(drive, file_id)
+        print('already download file')
+
+        start_chunk_page = [v for k, v in locate_chunks(pdf_bytes= pdf_bytes, debug= False).items() if k not in ( "last_page")]
+        
+        # start_chunk_page = [x if i == 5 or i == 6 else None for i, x in enumerate(start_chunk_page)]
+
+
+        for i, x in enumerate(start_chunk_page):
+            if x is None:
+                continue
+            
+        print(start_chunk_page)
+        for i in range(len(start_chunk_page)-1) :
+            if i != 1:
+                continue ####################################
+            if i == 4 :
+                continue
+            start_page = start_chunk_page[i]
+            end_page = start_chunk_page[i + 1]
+            print("                -------------             ")
+            
+            print("i =",i,"->",start_page,"and",end_page)
+
+            if start_page is None or end_page is None :
+                continue
+            chunk_pdf_bytes = slice_pdf_pages(
+                pdf_bytes=pdf_bytes,
+                start_page=start_page,
+                end_page=end_page
+            )
+
+            text = None
+
+            if i == 0:
+                number_first_have_text = find_first_page_non_empty(pdf_bytes=pdf_bytes)
+                chunk_pdf_bytes2 = slice_pdf_pages(pdf_bytes=pdf_bytes,start_page=number_first_have_text,end_page=number_first_have_text)
+                chunk_pdf_bytes = concat_pdf_bytes(chunk_pdf_bytes2,chunk_pdf_bytes)
+
 
         # --- select schema/prompt ---
         if chunk_idx == 0:
