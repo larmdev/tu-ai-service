@@ -36,7 +36,7 @@ class ChunkRequest(BaseModel):
 
 async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId, fileName, start_chunk_page):
     try:
-        # if chunk_idx != 3:
+        # if chunk_idx != 0:
         #     return
 
         if chunk_idx == 4 :
