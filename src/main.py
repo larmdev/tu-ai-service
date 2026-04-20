@@ -1,10 +1,11 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks, Query
 from pydantic import BaseModel
 from typing import Optional
 import os
 import json
 import asyncio
 import httpx
+import requests
 from dotenv import load_dotenv
 
 from function.fn_gemini import call_openrouter_pdf
@@ -24,12 +25,42 @@ CALLBACK_URL = os.getenv("CALLBACK_URL")
 
 app = FastAPI()
 
-from pydantic import BaseModel
-from typing import Optional
+
 class ChunkRequest(BaseModel):
     refId: str
     url: str
     fileName: Optional[str] = None
+
+
+_AI_TEST_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "ok": {"type": "boolean"},
+        "echo": {"type": "string"},
+    },
+    "required": ["ok", "echo"],
+}
+
+
+async def _run_ai_test(message: str) -> dict:
+    """เรียก OpenRouter แบบ text mode (ไม่ใช้ PDF) เพื่อยืนยันว่า key/model ใช้งานได้"""
+    prompt = (
+        "จากข้อความใน <<DATA>> เท่านั้น ให้ตอบตาม JSON schema:\n"
+        "- ok: true ถ้ามีข้อความใน DATA (ไม่ว่าง)\n"
+        "- echo: ข้อความจาก DATA ตัดให้ไม่เกิน 200 ตัวอักษรถ้ายาว"
+    )
+    return await asyncio.to_thread(
+        call_openrouter_pdf,
+        api_key=OPEN_ROUTER_KEY,
+        model=MODEL,
+        prompt=prompt,
+        schema=_AI_TEST_SCHEMA,
+        pdf_bytes=None,
+        text=message,
+        temperature=0.0,
+        timeout=60.0,
+    )
 
 
 async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId, fileName, start_chunk_page):
@@ -267,6 +298,29 @@ async def extract_curr(body: ChunkRequest, background_tasks: BackgroundTasks):
         "status": 200,
         "message": "Success. Processing started in background."
     }
+
+@app.get("/api/ai/test")
+async def ai_test_get(
+    message: str = Query(
+        "สวัสดี ทดสอบ AI",
+        min_length=1,
+        max_length=2000,
+        description="ข้อความส่งเข้าโมเดล (text mode)",
+    ),
+):
+    """
+    ทดสอบว่า OpenRouter ตอบได้ — ไม่โหลด PDF
+
+    ตัวอย่าง: `GET /api/ai/test` หรือ `GET /api/ai/test?message=hello`
+    """
+    try:
+        data = await _run_ai_test(message.strip())
+        return {"status": 200, "model": MODEL, "data": data}
+    except ValueError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    except requests.HTTPError as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
+
 
 @app.get("/api/env")
 async def env():
