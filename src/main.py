@@ -63,6 +63,29 @@ async def _run_ai_test(message: str) -> dict:
     )
 
 
+async def _call_openrouter_chunk(
+    prompt: str,
+    schema: dict,
+    chunk_pdf_bytes: bytes | None = None,
+    text: str | None = None,
+    temperature: float = 0.0,
+) -> dict:
+    """
+    เรียก OpenRouter แบบ PDF-only (ไม่ fallback)
+    """
+    return await asyncio.to_thread(
+        call_openrouter_pdf,
+        api_key=OPEN_ROUTER_KEY,
+        model=MODEL,
+        prompt=prompt,
+        schema=schema,
+        pdf_bytes=chunk_pdf_bytes,
+        text=text,
+        engine="native",
+        temperature=temperature,
+    )
+
+
 async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId, fileName, start_chunk_page):
     try:
         # if chunk_idx != 3:
@@ -122,8 +145,11 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             from fn_chunk.fn_chunk9 import schema_prompt
             schema, prompt, master_schema = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
 
-        data1 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-            engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+        data1 = await _call_openrouter_chunk(
+            prompt=prompt,
+            schema=schema,
+            chunk_pdf_bytes=chunk_pdf_bytes,
+            text=text,
             temperature=0.00,
         )
 
@@ -142,8 +168,11 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
         if chunk_idx == 3 :
             from fn_chunk.fn_chunk4_1_2 import schema_prompt
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-            data2 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+            data2 = await _call_openrouter_chunk(
+                prompt=prompt,
+                schema=schema,
+                chunk_pdf_bytes=chunk_pdf_bytes,
+                text=text,
                 temperature=0.00,
             )
 
@@ -158,8 +187,11 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
                 end_page=end_page
             )
 
-            data3 = await asyncio.to_thread(call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+            data3 = await _call_openrouter_chunk(
+                prompt=prompt,
+                schema=schema,
+                chunk_pdf_bytes=chunk_pdf_bytes,
+                text=text,
                 temperature=0.00,
             )
 
@@ -171,16 +203,22 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
             text = text_with_tables(chunk_pdf_bytes)
             chunk_pdf_bytes2 = None
-            data2 = await asyncio.to_thread(call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes2,text = text,
-                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+            data2 = await _call_openrouter_chunk(
+                prompt=prompt,
+                schema=schema,
+                chunk_pdf_bytes=chunk_pdf_bytes2,
+                text=text,
                 temperature=0.00,
             )
             text=None
 
             from fn_chunk.fn_chunk5_1_3 import schema_prompt
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-            data3 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+            data3 = await _call_openrouter_chunk(
+                prompt=prompt,
+                schema=schema,
+                chunk_pdf_bytes=chunk_pdf_bytes,
+                text=text,
                 temperature=0.00,
             )
 
@@ -190,8 +228,11 @@ async def process_single_chunk(chunk_idx, start_page, end_page, pdf_bytes, refId
         if chunk_idx == 6 :
             from fn_chunk.fn_chunk6_1_2 import schema_prompt
             schema, prompt = schema_prompt(chunk_pdf_bytes=chunk_pdf_bytes)
-            data2 = await asyncio.to_thread (call_openrouter_pdf,api_key=OPEN_ROUTER_KEY,model=MODEL,prompt=prompt,schema=schema,pdf_bytes=chunk_pdf_bytes,text = text,
-                engine="pdf-text", #"mistral-ocr" สำหรับรูปภาพ
+            data2 = await _call_openrouter_chunk(
+                prompt=prompt,
+                schema=schema,
+                chunk_pdf_bytes=chunk_pdf_bytes,
+                text=text,
                 temperature=0.00,
             )
 
