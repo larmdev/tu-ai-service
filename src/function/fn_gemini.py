@@ -4,6 +4,20 @@ import requests
 from typing import Any, Dict, Optional
 
 
+def _openrouter_error_detail(resp: requests.Response) -> str:
+    """รวมข้อความ error จาก body ของ OpenRouter (มิฉะนั้น 400 จะไม่บอกสาเหตุ)."""
+    try:
+        data = resp.json()
+        err = data.get("error")
+        if isinstance(err, dict):
+            return str(err.get("message") or err.get("code") or json.dumps(err, ensure_ascii=False))
+        if err is not None:
+            return str(err)
+        return json.dumps(data, ensure_ascii=False)[:4000]
+    except Exception:
+        return (resp.text or "")[:4000]
+
+
 def extract_json_object(text: str) -> str | None:
     """Very small JSON 'healing': strip ``` fences and grab the outer {...}."""
     if not text:
@@ -73,8 +87,24 @@ def call_openrouter_pdf(
     if (pdf_bytes is None and not text) or (pdf_bytes is not None and text):
         raise ValueError("Provide exactly one input: either pdf_bytes OR text.")
 
-    if pdf_bytes is not None and engine not in ("pdf-text", "mistral-ocr", "native"):
-        raise ValueError("engine must be one of: pdf-text, mistral-ocr, native")
+    if pdf_bytes is not None and engine not in (
+        "pdf-text",
+        "mistral-ocr",
+        "native",
+        "cloudflare-ai",
+    ):
+        raise ValueError(
+            "engine must be one of: pdf-text, mistral-ocr, native, cloudflare-ai"
+        )
+
+    if not (api_key or "").strip():
+        raise ValueError(
+            "OPEN_ROUTER_KEY ไม่ได้ตั้งค่าหรือว่าง — ตั้งค่าใน environment ก่อนเรียก API"
+        )
+    if not (model or "").strip():
+        raise ValueError(
+            "MODEL ไม่ได้ตั้งค่าหรือว่าง — ใช้ slug ของ OpenRouter เช่น google/gemini-2.5-flash-preview-05-20"
+        )
 
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -216,7 +246,14 @@ def call_openrouter_pdf(
         }
 
     resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
-    resp.raise_for_status()
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError as e:
+        detail = _openrouter_error_detail(resp)
+        raise requests.HTTPError(
+            f"{resp.status_code} Client Error for url {url}: {detail}",
+            response=resp,
+        ) from e
     result = resp.json()
 
     content = result["choices"][0]["message"]["content"]
